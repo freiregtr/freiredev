@@ -12,7 +12,7 @@ const categories = getAllCategories(allPosts);
 // Obtener subcategorías para cada categoría
 const categoriesWithSubs = categories.map(category => ({
   ...category,
-  subcategories: getSubcategoriesByCategory(allPosts, category.id)
+  subcategories: getSubcategoriesByCategory(allPosts, category.slug)
 }));
 ---
 
@@ -49,7 +49,7 @@ const categoriesWithSubs = categories.map(category => ({
       <div class="categories-list">
         {categoriesWithSubs.map((category, index) => (
           <div class="category-item-wrapper">
-            <a href={`/categoria/${category.id}`} class="category-item" data-category={category.id}>
+            <a href={`/categoria/${category.slug}`} class="category-item" data-category={category.slug}>
               <div class="category-header">
                 <span class="category-number" style={`color: ${category.color}; text-shadow: 0 0 10px ${category.color}`}>
                   [{index + 1}]
@@ -70,7 +70,7 @@ const categoriesWithSubs = categories.map(category => ({
             {category.subcategories.length > 0 && (
               <div class="subcategories-list" data-parent-category={index}>
                 {category.subcategories.map((sub, subIndex) => (
-                  <a href={`/subcategoria/${sub.id}`} class="subcategory-card" data-subcategory-index={subIndex} style={`border-color: ${category.color}`}>
+                  <a href={`/subcategoria/${sub.slug}`} class="subcategory-card" data-subcategory-index={subIndex} style={`border-color: ${category.color}`}>
                     <div class="subcategory-header">
                       <span class="subcategory-indicator" style={`color: ${category.color}; text-shadow: 0 0 8px ${category.color}`}>
                         ├──
@@ -444,7 +444,7 @@ const categoriesWithSubs = categories.map(category => ({
 
 <script>
   // Typing effect
-  const terminalBody = document.querySelector('.terminal-body');
+  const terminalBody = document.querySelector('.terminal-body') as HTMLElement | null;
 
   if (terminalBody) {
     // Ocultar todo el contenido inicialmente
@@ -455,9 +455,9 @@ const categoriesWithSubs = categories.map(category => ({
       terminalBody.style.opacity = '1';
 
       // Ocultar todos los elementos inicialmente
-      const terminalLine = document.querySelector('.terminal-line');
-      const outputHeader = document.querySelector('.terminal-output-header');
-      const inputLine = document.querySelector('.terminal-input-line');
+      const terminalLine = document.querySelector('.terminal-line') as HTMLElement | null;
+      const outputHeader = document.querySelector('.terminal-output-header') as HTMLElement | null;
+      const inputLine = document.querySelector('.terminal-input-line') as HTMLElement | null;
       const categoryWrappers = document.querySelectorAll('.category-item-wrapper');
 
       if (terminalLine) {
@@ -475,7 +475,7 @@ const categoriesWithSubs = categories.map(category => ({
 
       // Ocultar categorías y subcategorías
       categoryWrappers.forEach(wrapper => {
-        const categoryItem = wrapper.querySelector('.category-item');
+        const categoryItem = wrapper.querySelector('.category-item') as HTMLElement | null;
         const subcategories = wrapper.querySelectorAll('.subcategory-card');
 
         if (categoryItem) {
@@ -483,8 +483,8 @@ const categoriesWithSubs = categories.map(category => ({
           categoryItem.style.transform = 'translateY(10px)';
         }
         subcategories.forEach(sub => {
-          sub.style.opacity = '0';
-          sub.style.transform = 'translateY(10px)';
+          (sub as HTMLElement).style.opacity = '0';
+          (sub as HTMLElement).style.transform = 'translateY(10px)';
         });
       });
 
@@ -497,9 +497,9 @@ const categoriesWithSubs = categories.map(category => ({
           terminalLine.style.opacity = '1';
           terminalLine.style.transform = 'translateY(0)';
 
-          const commandElement = terminalLine.querySelector('.terminal-command');
+          const commandElement = terminalLine.querySelector('.terminal-command') as HTMLElement | null;
           if (commandElement) {
-            const originalText = commandElement.textContent;
+            const originalText = commandElement.textContent || '';
             commandElement.textContent = '';
             let charIndex = 0;
 
@@ -523,9 +523,9 @@ const categoriesWithSubs = categories.map(category => ({
           outputHeader.style.opacity = '1';
           outputHeader.style.transform = 'translateY(0)';
 
-          const textElement = outputHeader.querySelector('.output-text');
+          const textElement = outputHeader.querySelector('.output-text') as HTMLElement | null;
           if (textElement) {
-            const originalText = textElement.textContent;
+            const originalText = textElement.textContent || '';
             textElement.textContent = '';
             let charIndex = 0;
 
@@ -543,8 +543,8 @@ const categoriesWithSubs = categories.map(category => ({
       currentDelay += 800;
 
       // Animar categorías y subcategorías secuencialmente
-      categoryWrappers.forEach((wrapper, index) => {
-        const categoryItem = wrapper.querySelector('.category-item');
+      categoryWrappers.forEach((wrapper, _index) => {
+        const categoryItem = wrapper.querySelector('.category-item') as HTMLElement | null;
         const subcategories = wrapper.querySelectorAll('.subcategory-card');
 
         // Animar categoría
@@ -558,11 +558,11 @@ const categoriesWithSubs = categories.map(category => ({
         currentDelay += 400;
 
         // Animar subcategorías de esta categoría
-        subcategories.forEach((sub, subIndex) => {
+        subcategories.forEach((sub, _subIndex) => {
           setTimeout(() => {
-            sub.style.transition = 'all 0.3s ease';
-            sub.style.opacity = '1';
-            sub.style.transform = 'translateY(0)';
+            (sub as HTMLElement).style.transition = 'all 0.3s ease';
+            (sub as HTMLElement).style.opacity = '1';
+            (sub as HTMLElement).style.transform = 'translateY(0)';
           }, currentDelay);
           currentDelay += 200;
         });

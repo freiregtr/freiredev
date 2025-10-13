@@ -67,7 +67,7 @@ const postsByCategory = categories.map(cat => ({
       <p class="hero-description">{description}</p>
       {tags && tags.length > 0 && (
         <div class="hero-tags">
-          {tags.map((tag) => (
+          {tags.map((tag: string) => (
             <span class="hero-tag">#{tag}</span>
           ))}
         </div>

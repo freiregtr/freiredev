@@ -17,7 +17,7 @@ const categories = getAllCategories(allPosts);
 
 const categoryData = categories.map(category => {
   const posts = allPosts
-    .filter(post => post.data.category === category.id)
+    .filter(post => post.data.category === category.slug)
     .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
     .slice(0, 6);
 
@@ -28,7 +28,7 @@ const categoryData = categories.map(category => {
 });
 
 // Crear un mapa para acceso rápido por slug
-const categoryMap = new Map(categories.map(cat => [cat.id, cat]));
+const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
 ---
 
 <BaseLayout title="FreireDev - Blog de Tecnología">
@@ -73,7 +73,7 @@ const categoryMap = new Map(categories.map(cat => [cat.id, cat]));
                     </time>
                     {post.data.tags && post.data.tags.length > 0 && (
                       <div class="carousel-tags">
-                        {post.data.tags.slice(0, 3).map((tag) => (
+                        {post.data.tags.slice(0, 3).map((tag: string) => (
                           <span class="carousel-tag">#{tag}</span>
                         ))}
                       </div>
@@ -119,7 +119,7 @@ const categoryMap = new Map(categories.map(cat => [cat.id, cat]));
               {category.name}
             </h2>
           </div>
-          <a href={`/categoria/${category.id}`} class="island-more" style={`border-color: ${category.color}; color: ${category.color}`}>
+          <a href={`/categoria/${category.slug}`} class="island-more" style={`border-color: ${category.color}; color: ${category.color}`}>
             MÁS
             <span class="more-arrow">→</span>
           </a>
@@ -155,7 +155,7 @@ const categoryMap = new Map(categories.map(cat => [cat.id, cat]));
                     <div class="card-full-content">
                       <div class="card-meta">
                         <span class="card-category" style={`color: ${category.color}`}>
-                          [{category.id.toUpperCase()}]
+                          [{category.slug.toUpperCase()}]
                         </span>
                         <time class="card-date">
                           {new Date(post.data.pubDate).toLocaleDateString('es-ES', {
@@ -173,7 +173,7 @@ const categoryMap = new Map(categories.map(cat => [cat.id, cat]));
 
                       {(cardClass === 'featured' || cardClass === 'small') && post.data.tags && post.data.tags.length > 0 && (
                         <div class="card-tags">
-                          {post.data.tags.slice(0, cardClass === 'small' ? 2 : 3).map((tag) => (
+                          {post.data.tags.slice(0, cardClass === 'small' ? 2 : 3).map((tag: string) => (
                             <span class="card-tag">#{tag}</span>
                           ))}
                         </div>

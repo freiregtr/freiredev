@@ -106,7 +106,7 @@ const categoryNames: Record<string, string> = {
 
               {post.data.tags && post.data.tags.length > 0 && (
                 <div class="post-tags">
-                  {post.data.tags.slice(0, 4).map((tag) => (
+                  {post.data.tags.slice(0, 4).map((tag: string) => (
                     <span class="post-tag">#{tag}</span>
                   ))}
                 </div>

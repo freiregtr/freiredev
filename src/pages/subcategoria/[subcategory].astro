@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import { getAllSubcategories } from '../../utils/categories';
 
 export async function getStaticPaths() {
@@ -11,11 +11,23 @@ export async function getStaticPaths() {
   const subcategories = getAllSubcategories(allPosts);
   const postsPerPage = 6;
 
-  const paths = [];
+  const paths: Array<{
+    params: { subcategory: string };
+    props: {
+      posts: CollectionEntry<'blog'>[];
+      categorySlug: string;
+      categoryName: string;
+      categoryColor: string;
+      parentCategory: string;
+      currentPage: number;
+      totalPages: number;
+      totalPosts: number;
+    };
+  }> = [];
 
   subcategories.forEach(subInfo => {
     const filteredPosts = allPosts
-      .filter(post => post.data.subcategory === subInfo.id)
+      .filter(post => post.data.subcategory === subInfo.slug)
       .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
     const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
@@ -26,10 +38,10 @@ export async function getStaticPaths() {
       const pagePosts = filteredPosts.slice(start, end);
 
       paths.push({
-        params: { subcategory: page === 1 ? subInfo.id : `${subInfo.id}/${page}` },
+        params: { subcategory: page === 1 ? subInfo.slug : `${subInfo.slug}/${page}` },
         props: {
           posts: pagePosts,
-          categorySlug: subInfo.id,
+          categorySlug: subInfo.slug,
           categoryName: subInfo.name,
           categoryColor: '#6fc3df',
           parentCategory: subInfo.category,
@@ -72,7 +84,7 @@ const { posts, categorySlug, categoryName, categoryColor, parentCategory, curren
     </div>
   ) : (
     <div class="posts-grid">
-      {posts.map((post) => (
+      {posts.map((post: CollectionEntry<'blog'>) => (
         <article class="post-card">
           <a href={`/blog/${post.id}`} class="post-card-link">
             <div class="post-glow" style={`background: linear-gradient(90deg, transparent, ${categoryColor}, transparent)`}></div>
@@ -111,7 +123,7 @@ const { posts, categorySlug, categoryName, categoryColor, parentCategory, curren
 
                 {post.data.tags && post.data.tags.length > 0 && (
                   <div class="post-tags">
-                    {post.data.tags.slice(0, 3).map((tag) => (
+                    {post.data.tags.slice(0, 3).map((tag: string) => (
                       <span class="post-tag">#{tag}</span>
                     ))}
                   </div>

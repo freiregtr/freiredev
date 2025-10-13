@@ -124,7 +124,7 @@ export function getCategoryInfo(
   posts: CollectionEntry<'blog'>[],
   categorySlug: string
 ): CategoryInfo | undefined {
-  return getAllCategories(posts).find(cat => cat.id === categorySlug);
+  return getAllCategories(posts).find(cat => cat.slug === categorySlug);
 }
 
 // Obtener posts por categoría
