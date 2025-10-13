@@ -8,8 +8,8 @@ const blog = defineCollection({
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
     heroImage: z.string().optional(),
-    category: z.string(), // Dinámico - detecta cualquier categoría
-    subcategory: z.string().optional(), // Soporte para subcategorías
+    category: z.string(),
+    subcategory: z.string().optional(),
     tags: z.array(z.string()).optional(),
     author: z.string().default('Ramon Freire'),
     draft: z.boolean().default(false),

@@ -12,7 +12,7 @@ const categories = getAllCategories(allPosts);
 // Obtener subcategorías para cada categoría
 const categoriesWithSubs = categories.map(category => ({
   ...category,
-  subcategories: getSubcategoriesByCategory(allPosts, category.slug)
+  subcategories: getSubcategoriesByCategory(allPosts, category.id)
 }));
 ---
 
@@ -49,7 +49,7 @@ const categoriesWithSubs = categories.map(category => ({
       <div class="categories-list">
         {categoriesWithSubs.map((category, index) => (
           <div class="category-item-wrapper">
-            <a href={`/categoria/${category.slug}`} class="category-item" data-category={category.slug}>
+            <a href={`/categoria/${category.id}`} class="category-item" data-category={category.id}>
               <div class="category-header">
                 <span class="category-number" style={`color: ${category.color}; text-shadow: 0 0 10px ${category.color}`}>
                   [{index + 1}]
@@ -70,7 +70,7 @@ const categoriesWithSubs = categories.map(category => ({
             {category.subcategories.length > 0 && (
               <div class="subcategories-list" data-parent-category={index}>
                 {category.subcategories.map((sub, subIndex) => (
-                  <a href={`/subcategoria/${sub.slug}`} class="subcategory-card" data-subcategory-index={subIndex} style={`border-color: ${category.color}`}>
+                  <a href={`/subcategoria/${sub.id}`} class="subcategory-card" data-subcategory-index={subIndex} style={`border-color: ${category.color}`}>
                     <div class="subcategory-header">
                       <span class="subcategory-indicator" style={`color: ${category.color}; text-shadow: 0 0 8px ${category.color}`}>
                         ├──

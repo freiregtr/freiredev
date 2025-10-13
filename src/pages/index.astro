@@ -17,7 +17,7 @@ const categories = getAllCategories(allPosts);
 
 const categoryData = categories.map(category => {
   const posts = allPosts
-    .filter(post => post.data.category === category.slug)
+    .filter(post => post.data.category === category.id)
     .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
     .slice(0, 6);
 
@@ -28,7 +28,7 @@ const categoryData = categories.map(category => {
 });
 
 // Crear un mapa para acceso rápido por slug
-const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
+const categoryMap = new Map(categories.map(cat => [cat.id, cat]));
 ---
 
 <BaseLayout title="FreireDev - Blog de Tecnología">
@@ -39,7 +39,7 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
         const categoryInfo = categoryMap.get(post.data.category);
         return (
           <div class={`carousel-slide ${index === 0 ? 'active' : ''}`} data-index={index}>
-            <a href={`/blog/${post.slug}`} class="carousel-link">
+            <a href={`/blog/${post.id}`} class="carousel-link">
               {post.data.heroImage && (
                 <div class="carousel-image-wrapper">
                   <img src={post.data.heroImage} alt={post.data.title} class="carousel-image" />
@@ -65,7 +65,7 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
                   <p class="carousel-description">{post.data.description}</p>
                   <div class="carousel-meta">
                     <time class="carousel-date">
-                      {post.data.pubDate.toLocaleDateString('es-ES', {
+                      {new Date(post.data.pubDate).toLocaleDateString('es-ES', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric'
@@ -119,7 +119,7 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
               {category.name}
             </h2>
           </div>
-          <a href={`/categoria/${category.slug}`} class="island-more" style={`border-color: ${category.color}; color: ${category.color}`}>
+          <a href={`/categoria/${category.id}`} class="island-more" style={`border-color: ${category.color}; color: ${category.color}`}>
             MÁS
             <span class="more-arrow">→</span>
           </a>
@@ -134,7 +134,7 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
 
             return (
               <article class={`island-card ${cardClass}`}>
-                <a href={`/blog/${post.slug}`} class="card-link-wrapper">
+                <a href={`/blog/${post.id}`} class="card-link-wrapper">
                   <div class="card-glow" style={`background: linear-gradient(90deg, transparent, ${category.color}, transparent)`}></div>
 
                   {post.data.heroImage && (
@@ -155,10 +155,10 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
                     <div class="card-full-content">
                       <div class="card-meta">
                         <span class="card-category" style={`color: ${category.color}`}>
-                          [{category.slug.toUpperCase()}]
+                          [{category.id.toUpperCase()}]
                         </span>
                         <time class="card-date">
-                          {post.data.pubDate.toLocaleDateString('es-ES', {
+                          {new Date(post.data.pubDate).toLocaleDateString('es-ES', {
                             month: 'short',
                             day: 'numeric'
                           })}

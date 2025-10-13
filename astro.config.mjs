@@ -6,6 +6,11 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://freiredev.com', // Cambia esto a tu dominio
   integrations: [mdx(), sitemap()],
+  vite: {
+    resolve: {
+      preserveSymlinks: true
+    }
+  },
   markdown: {
     shikiConfig: {
       theme: 'one-dark-pro',

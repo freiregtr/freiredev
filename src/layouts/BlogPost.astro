@@ -20,7 +20,7 @@ const allPosts = await getCollection('blog', ({ data }) => {
 });
 
 const recentPosts = allPosts
-  .filter(post => post.slug !== slug)
+  .filter(post => post.id !== slug)
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 5);
 
@@ -60,7 +60,7 @@ const postsByCategory = categories.map(cat => ({
         </span>
         <span class="hero-separator">•</span>
         <time class="hero-date">
-          {pubDate.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
+          {new Date(pubDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
         </time>
       </div>
       <h1 class="hero-title">{title}</h1>
@@ -97,8 +97,8 @@ const postsByCategory = categories.map(cat => ({
                       {category.posts.map((post) => (
                         <li class="tree-post">
                           <a
-                            href={`/blog/${post.slug}`}
-                            class={post.slug === slug ? 'active' : ''}
+                            href={`/blog/${post.id}`}
+                            class={post.id === slug ? 'active' : ''}
                           >
                             {post.data.title}
                           </a>
@@ -130,7 +130,7 @@ const postsByCategory = categories.map(cat => ({
           <div class="post-updated">
             <span class="updated-label">ACTUALIZADO:</span>
             <time>
-              {updatedDate.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
+              {new Date(updatedDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
             </time>
           </div>
         )}
@@ -169,13 +169,13 @@ const postsByCategory = categories.map(cat => ({
             <ul class="recent-list">
               {recentPosts.map((post) => (
                 <li class="recent-item">
-                  <a href={`/blog/${post.slug}`} class="recent-link">
+                  <a href={`/blog/${post.id}`} class="recent-link">
                     <span class="recent-category" style={`color: ${categoryColors[post.data.category]}`}>
                       [{post.data.category.substring(0, 3).toUpperCase()}]
                     </span>
                     <span class="recent-title">{post.data.title}</span>
                     <time class="recent-date">
-                      {post.data.pubDate.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' })}
+                      {new Date(post.data.pubDate).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' })}
                     </time>
                   </a>
                 </li>

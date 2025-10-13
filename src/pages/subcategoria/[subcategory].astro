@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 
   subcategories.forEach(subInfo => {
     const filteredPosts = allPosts
-      .filter(post => post.data.subcategory === subInfo.slug)
+      .filter(post => post.data.subcategory === subInfo.id)
       .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
     const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
@@ -26,10 +26,10 @@ export async function getStaticPaths() {
       const pagePosts = filteredPosts.slice(start, end);
 
       paths.push({
-        params: { subcategory: page === 1 ? subInfo.slug : `${subInfo.slug}/${page}` },
+        params: { subcategory: page === 1 ? subInfo.id : `${subInfo.id}/${page}` },
         props: {
           posts: pagePosts,
-          categorySlug: subInfo.slug,
+          categorySlug: subInfo.id,
           categoryName: subInfo.name,
           categoryColor: '#6fc3df',
           parentCategory: subInfo.category,
@@ -74,7 +74,7 @@ const { posts, categorySlug, categoryName, categoryColor, parentCategory, curren
     <div class="posts-grid">
       {posts.map((post) => (
         <article class="post-card">
-          <a href={`/blog/${post.slug}`} class="post-card-link">
+          <a href={`/blog/${post.id}`} class="post-card-link">
             <div class="post-glow" style={`background: linear-gradient(90deg, transparent, ${categoryColor}, transparent)`}></div>
 
             {post.data.heroImage && (
@@ -95,7 +95,7 @@ const { posts, categorySlug, categoryName, categoryColor, parentCategory, curren
               <div class="post-full-content">
                 <div class="post-meta">
                   <time class="post-date">
-                    {post.data.pubDate.toLocaleDateString('es-ES', {
+                    {new Date(post.data.pubDate).toLocaleDateString('es-ES', {
                       month: 'short',
                       day: 'numeric',
                       year: 'numeric'

@@ -77,7 +77,7 @@ const categoryNames: Record<string, string> = {
     <div class="posts-list">
       {paginatedPosts.map((post) => (
         <article class="post-card" data-category={post.data.category}>
-          <a href={`/blog/${post.slug}`} class="post-link">
+          <a href={`/blog/${post.id}`} class="post-link">
             <!-- Imagen del Post -->
             <div class="post-image">
               {post.data.heroImage ? (
@@ -96,7 +96,7 @@ const categoryNames: Record<string, string> = {
                 </span>
                 <span class="post-separator">•</span>
                 <time class="post-date">
-                  {post.data.pubDate.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })}
+                  {new Date(post.data.pubDate).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })}
                 </time>
               </div>
 

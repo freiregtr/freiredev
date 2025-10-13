@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 
   categories.forEach(categoryInfo => {
     const filteredPosts = allPosts
-      .filter(post => post.data.category === categoryInfo.slug)
+      .filter(post => post.data.category === categoryInfo.id)
       .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
     const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
@@ -26,10 +26,10 @@ export async function getStaticPaths() {
       const pagePosts = filteredPosts.slice(start, end);
 
       paths.push({
-        params: { category: page === 1 ? categoryInfo.slug : `${categoryInfo.slug}/${page}` },
+        params: { category: page === 1 ? categoryInfo.id : `${categoryInfo.id}/${page}` },
         props: {
           posts: pagePosts,
-          categorySlug: categoryInfo.slug,
+          categorySlug: categoryInfo.id,
           categoryName: categoryInfo.name,
           categoryColor: categoryInfo.color,
           currentPage: page,
@@ -73,7 +73,7 @@ const { posts, categorySlug, categoryName, categoryColor, currentPage, totalPage
     <div class="posts-grid">
       {posts.map((post) => (
         <article class="post-card">
-          <a href={`/blog/${post.slug}`} class="post-card-link">
+          <a href={`/blog/${post.id}`} class="post-card-link">
             <div class="post-glow" style={`background: linear-gradient(90deg, transparent, ${categoryColor}, transparent)`}></div>
 
             {post.data.heroImage && (
@@ -94,7 +94,7 @@ const { posts, categorySlug, categoryName, categoryColor, currentPage, totalPage
               <div class="post-full-content">
                 <div class="post-meta">
                   <time class="post-date">
-                    {post.data.pubDate.toLocaleDateString('es-ES', {
+                    {new Date(post.data.pubDate).toLocaleDateString('es-ES', {
                       month: 'short',
                       day: 'numeric',
                       year: 'numeric'
