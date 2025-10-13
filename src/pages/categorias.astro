@@ -1,0 +1,598 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { getAllCategories, getSubcategoriesByCategory } from '../utils/categories';
+
+const allPosts = await getCollection('blog', ({ data }) => {
+  return data.draft !== true;
+});
+
+const categories = getAllCategories(allPosts);
+
+// Obtener subcategorías para cada categoría
+const categoriesWithSubs = categories.map(category => ({
+  ...category,
+  subcategories: getSubcategoriesByCategory(allPosts, category.slug)
+}));
+---
+
+<BaseLayout title="Categorías - FreireDev">
+  <!-- Terminal Window -->
+  <div class="terminal-container">
+    <!-- Terminal Header -->
+    <div class="terminal-header">
+      <div class="terminal-buttons">
+        <span class="terminal-btn close"></span>
+        <span class="terminal-btn minimize"></span>
+        <span class="terminal-btn maximize"></span>
+      </div>
+      <div class="terminal-title">categorias.sh</div>
+    </div>
+
+    <!-- Terminal Body -->
+    <div class="terminal-body">
+      <!-- Command Line -->
+      <div class="terminal-line">
+        <span class="terminal-user">usuario@freiredev</span>
+        <span class="terminal-separator">:</span>
+        <span class="terminal-path">~/categorias</span>
+        <span class="terminal-prompt">$</span>
+        <span class="terminal-command">ls -la</span>
+      </div>
+
+      <!-- Output Header -->
+      <div class="terminal-output-header">
+        <span class="output-text">Selecciona una categoría:</span>
+      </div>
+
+      <!-- Categories List -->
+      <div class="categories-list">
+        {categoriesWithSubs.map((category, index) => (
+          <div class="category-item-wrapper">
+            <a href={`/categoria/${category.slug}`} class="category-item" data-category={category.slug}>
+              <div class="category-header">
+                <span class="category-number" style={`color: ${category.color}; text-shadow: 0 0 10px ${category.color}`}>
+                  [{index + 1}]
+                </span>
+                <span class="category-name" style={`color: ${category.color}`}>
+                  {category.name}
+                </span>
+                <span class="category-count">
+                  ({category.count} {category.count === 1 ? 'post' : 'posts'})
+                </span>
+              </div>
+              <div class="category-description">
+                <span class="tree-line">└──</span>
+                <span class="description-text">{category.description}</span>
+              </div>
+            </a>
+
+            {category.subcategories.length > 0 && (
+              <div class="subcategories-list" data-parent-category={index}>
+                {category.subcategories.map((sub, subIndex) => (
+                  <a href={`/subcategoria/${sub.slug}`} class="subcategory-card" data-subcategory-index={subIndex} style={`border-color: ${category.color}`}>
+                    <div class="subcategory-header">
+                      <span class="subcategory-indicator" style={`color: ${category.color}; text-shadow: 0 0 8px ${category.color}`}>
+                        ├──
+                      </span>
+                      <span class="subcategory-name" style={`color: ${category.color}`}>
+                        {sub.name}
+                      </span>
+                      <span class="subcategory-count">
+                        ({sub.count})
+                      </span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <!-- Input Line -->
+      <div class="terminal-input-line">
+        <span class="terminal-user">usuario@freiredev</span>
+        <span class="terminal-separator">:</span>
+        <span class="terminal-path">~/categorias</span>
+        <span class="terminal-prompt">$</span>
+        <span class="terminal-cursor">_</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Back Link -->
+  <div class="back-section">
+    <a href="/" class="back-button">
+      <span class="back-arrow">←</span>
+      <span class="back-text">VOLVER A INICIO</span>
+    </a>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Terminal Container */
+  .terminal-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #1a1d24;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 217, 255, 0.3);
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.4),
+      0 0 1px rgba(255, 255, 255, 0.1) inset,
+      0 0 40px rgba(0, 217, 255, 0.2);
+  }
+
+  /* Terminal Header - macOS style */
+  .terminal-header {
+    background: linear-gradient(180deg, #2d3036 0%, #24272e 100%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .terminal-buttons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .terminal-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+  }
+
+  .terminal-btn.close {
+    background: #ff5f57;
+  }
+
+  .terminal-btn.minimize {
+    background: #febc2e;
+  }
+
+  .terminal-btn.maximize {
+    background: #28c840;
+  }
+
+  .terminal-title {
+    font-family: var(--font-primary);
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+  }
+
+  /* Terminal Body */
+  .terminal-body {
+    padding: 2rem;
+    font-family: 'Fira Code', 'Menlo', 'Monaco', 'Courier New', monospace;
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: #e6edf3;
+  }
+
+  /* Command Line */
+  .terminal-line {
+    margin-bottom: 1.5rem;
+  }
+
+  .terminal-user {
+    color: #7ee787;
+    font-weight: 600;
+  }
+
+  .terminal-separator {
+    color: #8b949e;
+    margin: 0 0.25rem;
+  }
+
+  .terminal-path {
+    color: #58a6ff;
+    font-weight: 600;
+  }
+
+  .terminal-prompt {
+    color: #e6edf3;
+    margin: 0 0.5rem;
+    font-weight: 700;
+  }
+
+  .terminal-command {
+    color: #ffa657;
+  }
+
+  /* Output Header */
+  .terminal-output-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+  }
+
+  .output-text {
+    color: var(--cyan-bright);
+    font-weight: 600;
+  }
+
+  /* Categories List */
+  .categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .category-item-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .category-item {
+    display: block;
+    padding: 1.25rem;
+    background: rgba(13, 18, 33, 0.5);
+    border: 1px solid rgba(0, 217, 255, 0.2);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .category-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, currentColor, transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .category-item:hover {
+    background: rgba(13, 18, 33, 0.8);
+    border-color: currentColor;
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
+    transform: translateX(10px);
+  }
+
+  .category-item:hover::before {
+    opacity: 1;
+  }
+
+  .category-item:nth-child(1) { color: #00d9ff; }
+  .category-item:nth-child(2) { color: #ff6b35; }
+  .category-item:nth-child(3) { color: #6fc3df; }
+  .category-item:nth-child(4) { color: #ffd700; }
+
+  /* Category Header */
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .category-number {
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+  }
+
+  .category-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.02em;
+  }
+
+  .category-count {
+    color: #8b949e;
+    font-size: 0.9rem;
+    margin-left: auto;
+  }
+
+  /* Category Description */
+  .category-description {
+    display: flex;
+    gap: 0.5rem;
+    padding-left: 2rem;
+    color: #8b949e;
+    font-size: 0.9rem;
+  }
+
+  .tree-line {
+    color: rgba(139, 148, 158, 0.5);
+  }
+
+  .description-text {
+    flex: 1;
+  }
+
+  /* Input Line */
+  .terminal-input-line {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 217, 255, 0.1);
+  }
+
+  .terminal-cursor {
+    color: var(--cyan-neon);
+    animation: blink 1s infinite;
+    font-weight: 700;
+    margin-left: 0.5rem;
+  }
+
+  @keyframes blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+
+  /* Back Section */
+  .back-section {
+    text-align: center;
+    margin-top: 3rem;
+  }
+
+  .back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-primary);
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--cyan-neon);
+    padding: 1rem 2rem;
+    border: 2px solid var(--cyan-neon);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .back-button:hover {
+    background: var(--cyan-neon);
+    color: var(--bg-primary);
+    box-shadow: 0 0 25px var(--cyan-glow);
+    transform: translateY(-2px);
+  }
+
+  .back-arrow {
+    transition: transform 0.3s ease;
+  }
+
+  .back-button:hover .back-arrow {
+    transform: translateX(-5px);
+  }
+
+  /* Responsive - Tablet */
+  @media (max-width: 1024px) {
+    .terminal-body {
+      padding: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .category-name {
+      font-size: 1rem;
+    }
+  }
+
+  /* Responsive - Mobile */
+  @media (max-width: 768px) {
+    .terminal-container {
+      border-radius: 8px;
+    }
+
+    .terminal-body {
+      padding: 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .terminal-line,
+    .terminal-input-line {
+      font-size: 0.75rem;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .category-item {
+      padding: 1rem;
+    }
+
+    .category-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .category-number {
+      font-size: 0.95rem;
+    }
+
+    .category-name {
+      font-size: 0.9rem;
+      line-height: 1.3;
+    }
+
+    .category-count {
+      width: auto;
+      margin-left: 0;
+      font-size: 0.8rem;
+      padding-left: 1.5rem;
+    }
+
+    .category-description {
+      padding-left: 0;
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+
+    .tree-line {
+      display: none;
+    }
+
+    .back-button {
+      font-size: 0.75rem;
+      padding: 0.75rem 1.25rem;
+    }
+  }
+</style>
+
+<script>
+  // Typing effect
+  const terminalBody = document.querySelector('.terminal-body');
+
+  if (terminalBody) {
+    // Ocultar todo el contenido inicialmente
+    terminalBody.style.opacity = '0';
+
+    // Esperar un momento y comenzar la animación
+    setTimeout(() => {
+      terminalBody.style.opacity = '1';
+
+      // Ocultar todos los elementos inicialmente
+      const terminalLine = document.querySelector('.terminal-line');
+      const outputHeader = document.querySelector('.terminal-output-header');
+      const inputLine = document.querySelector('.terminal-input-line');
+      const categoryWrappers = document.querySelectorAll('.category-item-wrapper');
+
+      if (terminalLine) {
+        terminalLine.style.opacity = '0';
+        terminalLine.style.transform = 'translateY(10px)';
+      }
+      if (outputHeader) {
+        outputHeader.style.opacity = '0';
+        outputHeader.style.transform = 'translateY(10px)';
+      }
+      if (inputLine) {
+        inputLine.style.opacity = '0';
+        inputLine.style.transform = 'translateY(10px)';
+      }
+
+      // Ocultar categorías y subcategorías
+      categoryWrappers.forEach(wrapper => {
+        const categoryItem = wrapper.querySelector('.category-item');
+        const subcategories = wrapper.querySelectorAll('.subcategory-card');
+
+        if (categoryItem) {
+          categoryItem.style.opacity = '0';
+          categoryItem.style.transform = 'translateY(10px)';
+        }
+        subcategories.forEach(sub => {
+          sub.style.opacity = '0';
+          sub.style.transform = 'translateY(10px)';
+        });
+      });
+
+      let currentDelay = 0;
+
+      // Animar terminal line
+      setTimeout(() => {
+        if (terminalLine) {
+          terminalLine.style.transition = 'all 0.4s ease';
+          terminalLine.style.opacity = '1';
+          terminalLine.style.transform = 'translateY(0)';
+
+          const commandElement = terminalLine.querySelector('.terminal-command');
+          if (commandElement) {
+            const originalText = commandElement.textContent;
+            commandElement.textContent = '';
+            let charIndex = 0;
+
+            const typeInterval = setInterval(() => {
+              if (charIndex < originalText.length) {
+                commandElement.textContent += originalText[charIndex];
+                charIndex++;
+              } else {
+                clearInterval(typeInterval);
+              }
+            }, 80);
+          }
+        }
+      }, currentDelay);
+      currentDelay += 1200;
+
+      // Animar output header
+      setTimeout(() => {
+        if (outputHeader) {
+          outputHeader.style.transition = 'all 0.4s ease';
+          outputHeader.style.opacity = '1';
+          outputHeader.style.transform = 'translateY(0)';
+
+          const textElement = outputHeader.querySelector('.output-text');
+          if (textElement) {
+            const originalText = textElement.textContent;
+            textElement.textContent = '';
+            let charIndex = 0;
+
+            const typeInterval = setInterval(() => {
+              if (charIndex < originalText.length) {
+                textElement.textContent += originalText[charIndex];
+                charIndex++;
+              } else {
+                clearInterval(typeInterval);
+              }
+            }, 80);
+          }
+        }
+      }, currentDelay);
+      currentDelay += 800;
+
+      // Animar categorías y subcategorías secuencialmente
+      categoryWrappers.forEach((wrapper, index) => {
+        const categoryItem = wrapper.querySelector('.category-item');
+        const subcategories = wrapper.querySelectorAll('.subcategory-card');
+
+        // Animar categoría
+        setTimeout(() => {
+          if (categoryItem) {
+            categoryItem.style.transition = 'all 0.4s ease';
+            categoryItem.style.opacity = '1';
+            categoryItem.style.transform = 'translateY(0)';
+          }
+        }, currentDelay);
+        currentDelay += 400;
+
+        // Animar subcategorías de esta categoría
+        subcategories.forEach((sub, subIndex) => {
+          setTimeout(() => {
+            sub.style.transition = 'all 0.3s ease';
+            sub.style.opacity = '1';
+            sub.style.transform = 'translateY(0)';
+          }, currentDelay);
+          currentDelay += 200;
+        });
+
+        // Pequeña pausa antes de la siguiente categoría
+        currentDelay += 200;
+      });
+
+      // Animar input line al final
+      setTimeout(() => {
+        if (inputLine) {
+          inputLine.style.transition = 'all 0.4s ease';
+          inputLine.style.opacity = '1';
+          inputLine.style.transform = 'translateY(0)';
+        }
+      }, currentDelay);
+    }, 100);
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    const key = e.key;
+    const categories = document.querySelectorAll('.category-item');
+
+    // Si presiona 1, 2, 3, 4 va a esa categoría
+    if (key >= '1' && key <= '4') {
+      const index = parseInt(key) - 1;
+      if (categories[index]) {
+        window.location.href = categories[index].getAttribute('href') || '#';
+      }
+    }
+  });
+</script>

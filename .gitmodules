@@ -1,0 +1,6 @@
+[submodule "src/content/blog"]
+	path = src/content/blog
+	url = https://github.com/freiregtr/freiredev-content.git
+[submodule "src/content/freiredev-content"]
+	path = src/content/freiredev-content
+	url = https://github.com/freiregtr/freiredev-content.git
