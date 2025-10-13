@@ -5,13 +5,11 @@ pubDate: "2025-01-09"
 category: "typescript"
 subcategory: "fundamentos"
 tags: ["typescript", "spread-operator", "iterables", "symbol-iterator", "fundamentos"]
-heroImage: "./img/image4.jpg"
+heroImage: "/images/blog/typescript/image4.jpg"
 draft: false
 ---
 
 # 04 - Operador Spread
-
-![Operador Spread en TypeScript](./img/image4.jpg)
 
 [Documentación oficial](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax)
 

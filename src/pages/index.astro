@@ -42,7 +42,7 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
             <a href={`/blog/${post.id}`} class="carousel-link">
               {post.data.heroImage && (
                 <div class="carousel-image-wrapper">
-                  <img src={post.data.heroImage.src} alt={post.data.title} class="carousel-image" />
+                  <img src={post.data.heroImage} alt={post.data.title} class="carousel-image" />
                   <div class="carousel-overlay"></div>
                   <div class="carousel-overlay-hover"></div>
                 </div>
@@ -139,7 +139,7 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
 
                   {post.data.heroImage && (
                     <div class="card-image-wrapper">
-                      <img src={post.data.heroImage.src} alt={post.data.title} class="card-image" />
+                      <img src={post.data.heroImage} alt={post.data.title} class="card-image" />
                       <div class="card-image-overlay"></div>
                       <div class="card-image-overlay-hover"></div>
                     </div>

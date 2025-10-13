@@ -5,13 +5,11 @@ pubDate: "2025-01-10"
 category: "typescript"
 subcategory: "fundamentos"
 tags: ["typescript", "arrays", "union-types", "spread-operator", "fundamentos"]
-heroImage: "./img/image5.jpg"
+heroImage: "/images/blog/typescript/image5.jpg"
 draft: false
 ---
 
 # 05 - Arrays
-
-![Arrays en TypeScript](./img/image5.jpg)
 
 ## Inferencia de tipos en arrays
 

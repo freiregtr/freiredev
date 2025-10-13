@@ -5,13 +5,11 @@ pubDate: "2025-01-06"
 category: "typescript"
 subcategory: "fundamentos"
 tags: ["typescript", "variables", "const", "let", "fundamentos"]
-heroImage: "./img/image1.jpg"
+heroImage: "/images/blog/typescript/image1.jpg"
 draft: false
 ---
 
 # 01 - Variables const y let
-
-![Variables const y let en TypeScript](./img/image1.jpg)
 
 ## Variables y nombres
 

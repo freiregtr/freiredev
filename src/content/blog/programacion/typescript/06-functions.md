@@ -5,13 +5,11 @@ pubDate: "2025-01-11"
 category: "typescript"
 subcategory: "fundamentos"
 tags: ["typescript", "funciones", "arrow-functions", "promesas", "fundamentos"]
-heroImage: "./img/image6.jpg"
+heroImage: "/images/blog/typescript/image6.jpg"
 draft: false
 ---
 
 # 06 - Funciones
-
-![Funciones en TypeScript](./img/image6.jpg)
 
 ## Tipos de funciones en TypeScript
 

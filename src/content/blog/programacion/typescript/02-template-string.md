@@ -5,13 +5,11 @@ pubDate: "2025-01-07"
 category: "typescript"
 subcategory: "fundamentos"
 tags: ["typescript", "template-strings", "strings", "fundamentos"]
-heroImage: "./img/image2.jpg"
+heroImage: "/images/blog/typescript/image2.jpg"
 draft: false
 ---
 
 # 02 - Template Strings
-
-![Template Strings en TypeScript](./img/image2.jpg)
 
 ## Template Strings en TypeScript
 

@@ -5,13 +5,11 @@ pubDate: "2025-01-08"
 category: "typescript"
 subcategory: "fundamentos"
 tags: ["typescript", "objetos", "interfaces", "spread-operator", "fundamentos"]
-heroImage: "./img/image3.jpg"
+heroImage: "/images/blog/typescript/image3.jpg"
 draft: false
 ---
 
 # 03 - Objetos Literales
-
-![Objetos Literales en TypeScript](./img/image3.jpg)
 
 ## Conceptos clave
 

@@ -81,7 +81,7 @@ const categoryNames: Record<string, string> = {
             <!-- Imagen del Post -->
             <div class="post-image">
               {post.data.heroImage ? (
-                <img src={post.data.heroImage.src} alt={post.data.title} />
+                <img src={post.data.heroImage} alt={post.data.title} />
               ) : (
                 <div class="post-image-fallback"></div>
               )}
