@@ -293,3 +293,25 @@ img {
   font-size: 0.85rem;
   margin-left: auto;
 }
+
+/* Content Wrapper - Fondo semi-transparente solo para Home */
+.content-wrapper {
+  background: rgba(10, 14, 26, 0.3);
+  border-radius: 12px;
+  backdrop-filter: blur(3px);
+}
+
+/* Padding exterior solo en home */
+.content-wrapper.home-wrapper {
+  padding: 2rem;
+  margin: -2rem;
+}
+
+/* Content Wrapper en Mobile */
+@media (max-width: 768px) {
+  .content-wrapper.home-wrapper {
+    padding: 1rem;
+    margin: -0.5rem;
+    border-radius: 8px;
+  }
+}

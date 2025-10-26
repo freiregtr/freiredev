@@ -57,6 +57,7 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
 ---
 
 <BaseLayout title="FreireDev - Blog de Tecnología">
+  <div class="content-wrapper home-wrapper">
   <!-- Carrusel Hero -->
   <div class="carousel-hero">
     <div class="carousel-container">
@@ -144,7 +145,7 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
               {category.name}
             </h2>
           </div>
-          <a href={`/${lang}/categoria/${category.slug}`} class="island-more" style={`border-color: ${category.color}; color: ${category.color}`}>
+          <a href={`/${lang}/categoria/${category.slug}`} class="island-more">
             MÁS
             <span class="more-arrow">→</span>
           </a>
@@ -192,13 +193,13 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
 
                       <h3 class="card-title">{post.data.title}</h3>
 
-                      {(cardClass === 'featured' || cardClass === 'small') && post.data.description && (
+                      {post.data.description && (
                         <p class="card-description">{post.data.description}</p>
                       )}
 
-                      {(cardClass === 'featured' || cardClass === 'small') && post.data.tags && post.data.tags.length > 0 && (
+                      {post.data.tags && post.data.tags.length > 0 && (
                         <div class="card-tags">
-                          {post.data.tags.slice(0, cardClass === 'small' ? 2 : 3).map((tag: string) => (
+                          {post.data.tags.slice(0, 2).map((tag: string) => (
                             <a href={`/${lang}/tag/${normalizeTag(tag)}`} class="card-tag">#{tag}</a>
                           ))}
                         </div>
@@ -213,6 +214,7 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
       </section>
     );
   })}
+  </div>
 </BaseLayout>
 
 <style>
@@ -224,7 +226,6 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
     overflow: hidden;
     margin-bottom: 4rem;
     border-bottom: 2px solid var(--cyan-neon);
-    box-shadow: 0 5px 30px rgba(0, 217, 255, 0.3);
   }
 
   .carousel-container {
@@ -551,7 +552,27 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
     font-size: 1.75rem;
     font-weight: 700;
     letter-spacing: 0.1em;
-    text-shadow: 0 0 20px currentColor;
+    color: #00d9ff !important;
+    text-shadow: 0 0 20px rgba(0, 217, 255, 0.8);
+    position: relative;
+    padding-bottom: 0.5rem;
+    display: inline-block;
+  }
+
+  .island-title::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--cyan-neon);
+    box-shadow: 0 0 10px var(--cyan-neon);
+    transition: width 0.3s ease;
+  }
+
+  .island-title:hover::before {
+    width: 100%;
   }
 
   .island-more {
@@ -563,66 +584,41 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
-    border: 2px solid;
+    border: 2px solid #00a8bf;
     border-radius: 4px;
     transition: all 0.3s ease;
     text-decoration: none;
+    color: #00d9ff !important;
+    background: transparent;
   }
 
   .island-more:hover {
-    background: currentColor;
-    color: var(--bg-primary) !important;
-    box-shadow: 0 0 20px currentColor;
-    transform: translateX(5px);
+    background: #008B9E;
+    color: #ffffff !important;
+    border-color: #006B7D;
+    box-shadow: 0 0 15px rgba(0, 139, 158, 0.5);
   }
 
   .more-arrow {
-    transition: transform 0.3s ease;
+    transition: opacity 0.3s ease;
   }
 
   .island-more:hover .more-arrow {
-    transform: translateX(5px);
+    opacity: 1;
   }
 
-  /* Island Grid - Layout 50/50 perfecto */
+  /* Island Grid - Layout 2 columnas horizontales */
   .island-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: 160px 160px 160px;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 160px);
     gap: 1.5rem;
   }
 
-  /* Featured (1) - Grande izquierda arriba, ocupa 2 columnas y 2 filas */
-  .island-card.featured {
-    grid-column: 1 / 3;
-    grid-row: 1 / 3;
-  }
-
-  /* Medium (2 y 3) - Pequeñas izquierda abajo, lado a lado */
-  .island-card.medium:nth-of-type(2) {
-    grid-column: 1 / 2;
-    grid-row: 3 / 4;
-  }
-
-  .island-card.medium:nth-of-type(3) {
-    grid-column: 2 / 3;
-    grid-row: 3 / 4;
-  }
-
-  /* Small (3) - Horizontales derecha, apiladas en 3 filas */
-  .island-card.small:nth-of-type(4) {
-    grid-column: 3 / 5;
-    grid-row: 1 / 2;
-  }
-
-  .island-card.small:nth-of-type(5) {
-    grid-column: 3 / 5;
-    grid-row: 2 / 3;
-  }
-
-  .island-card.small:nth-of-type(6) {
-    grid-column: 3 / 5;
-    grid-row: 3 / 4;
+  /* Todos los bloques ocupan 1 columna x 1 fila (distribución automática) */
+  .island-card {
+    grid-column: auto;
+    grid-row: auto;
   }
 
   /* Island Card Styles - Con imagen de fondo */
@@ -728,7 +724,7 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
   .card-content {
     position: relative;
     z-index: 2;
-    padding: 1.5rem;
+    padding: 1.25rem;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -736,37 +732,17 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
     overflow: hidden;
   }
 
-  .featured .card-content {
-    padding: 2rem;
-  }
-
-  .small .card-content {
-    padding: 1.25rem;
-  }
-
   /* Wrapper para el título pequeño (sin hover) */
   .card-title-small {
     position: absolute;
-    bottom: 1.5rem;
-    left: 1.5rem;
-    right: 1.5rem;
+    bottom: 1.25rem;
+    left: 1.25rem;
+    right: 1.25rem;
     transform: translateY(0);
     opacity: 1;
     transition: all 0.5s ease;
     pointer-events: none;
     z-index: 3;
-  }
-
-  .featured .card-title-small {
-    bottom: 2rem;
-    left: 2rem;
-    right: 2rem;
-  }
-
-  .small .card-title-small {
-    bottom: 1.25rem;
-    left: 1.25rem;
-    right: 1.25rem;
   }
 
   .island-card:hover .card-title-small {
@@ -778,34 +754,18 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
   /* Wrapper para el contenido completo (con hover) */
   .card-full-content {
     position: absolute;
-    bottom: 1.5rem;
-    left: 1.5rem;
-    right: 1.5rem;
+    bottom: 1.25rem;
+    left: 1.25rem;
+    right: 1.25rem;
     transform: translateY(120px);
     opacity: 0;
     transition: all 0.5s ease;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    z-index: 1;
-    max-height: calc(100% - 3rem);
-    overflow: hidden;
-  }
-
-  .featured .card-full-content {
-    bottom: 2rem;
-    left: 2rem;
-    right: 2rem;
-    gap: 0.75rem;
-    max-height: calc(100% - 4rem);
-  }
-
-  .small .card-full-content {
-    bottom: 1.25rem;
-    left: 1.25rem;
-    right: 1.25rem;
     gap: 0.4rem;
+    z-index: 1;
     max-height: calc(100% - 2.5rem);
+    overflow: hidden;
   }
 
   .island-card:hover .card-full-content {
@@ -838,56 +798,35 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
   /* Título pequeño - Solo visible sin hover */
   .card-title-small .card-title {
     font-family: var(--font-primary);
-    font-size: 0.95rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    line-height: 1.3;
+    line-height: 1.2;
     color: #ffffff;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
     margin: 0;
   }
 
-  .featured .card-title-small .card-title {
-    font-size: 1.25rem;
-  }
-
-  .small .card-title-small .card-title {
-    font-size: 0.85rem;
-  }
-
   /* Título grande - Visible en hover */
   .card-full-content .card-title {
     font-family: var(--font-primary);
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-weight: 700;
     line-height: 1.3;
     color: #ffffff;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
   }
 
-  .featured .card-full-content .card-title {
-    font-size: 1.75rem;
-  }
-
-  .small .card-full-content .card-title {
-    font-size: 1rem;
-  }
-
   /* Descripción */
   .card-description {
     color: var(--text-secondary);
-    font-size: 0.9rem;
-    line-height: 1.6;
+    font-size: 0.75rem;
+    line-height: 1.3;
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-  }
-
-  .small .card-description {
-    font-size: 0.75rem;
-    line-height: 1.3;
-    -webkit-line-clamp: 2;
+    text-overflow: ellipsis;
   }
 
   /* Tags */
@@ -899,9 +838,9 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
   }
 
   .card-tag {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: var(--cyan-bright);
-    padding: 0.25rem 0.5rem;
+    padding: 0.2rem 0.4rem;
     background: rgba(0, 217, 255, 0.1);
     border: 1px solid var(--cyan-neon);
     border-radius: 3px;
@@ -916,11 +855,6 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
     border-color: var(--cyan-bright);
     box-shadow: 0 0 15px var(--cyan-neon);
     transform: translateY(-1px);
-  }
-
-  .small .card-tag {
-    font-size: 0.65rem;
-    padding: 0.2rem 0.4rem;
   }
 
   /* Light Mode - Ajustes de texto */
@@ -1049,7 +983,7 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
       display: none;
     }
 
-    /* Mostrar solo info esencial */
+    /* Mostrar contenido hover permanentemente */
     .card-full-content {
       opacity: 1 !important;
       transform: translateY(0) !important;
@@ -1061,14 +995,24 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
       gap: 0.5rem;
     }
 
-    /* Ocultar descripción en móvil */
+    /* Mostrar descripción en móvil */
     .card-description {
-      display: none;
+      display: -webkit-box !important;
+      font-size: 0.7rem;
+      -webkit-line-clamp: 2;
     }
 
-    /* Ocultar tags en móvil */
+    /* Mostrar tags en móvil */
     .card-tags {
-      display: none;
+      display: flex !important;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .card-tag {
+      font-size: 0.6rem;
+      padding: 0.15rem 0.35rem;
+      white-space: nowrap;
     }
 
     /* Solo mostrar título y categoría */

@@ -1,13 +1,51 @@
 ---
-import { getLangFromUrl, getRouteFromUrl } from '../i18n/utils';
+import { getLangFromUrl } from '../i18n/utils';
 import { languages } from '../i18n/ui';
+import type { CollectionEntry } from 'astro:content';
 
+interface Props {
+  entryId?: string;
+  allPosts?: CollectionEntry<'blog'>[];
+}
+
+const { entryId, allPosts } = Astro.props;
 const currentLang = getLangFromUrl(Astro.url);
 const currentPath = Astro.url.pathname;
 
 // Function to switch language in current path
-function switchLanguage(newLang: string): string {
-  // Extract the path without the language prefix
+function switchLanguage(newLang: string): string | null {
+  // If we're on a blog post page and have the necessary data
+  if (entryId && allPosts) {
+    // Extract the post slug without language (e.g., "programacion/patrones-de-diseno/singleton/index.mdx")
+    const [currentPostLang, ...slugParts] = entryId.split('/');
+    const currentSlug = slugParts.join('/');
+
+    // Try to find the translation
+    const translation = allPosts.find(post => {
+      const [postLang, ...postSlugParts] = post.id.split('/');
+      const postSlug = postSlugParts.join('/');
+
+      // Check if it's the same post in different language
+      // We need to handle different folder names (e.g., "programacion" vs "programming")
+      // So we compare the last parts (title slug)
+      const currentLastPart = currentSlug.split('/').pop();
+      const postLastPart = postSlug.split('/').pop();
+
+      return postLang === newLang && currentLastPart === postLastPart;
+    });
+
+    if (translation) {
+      // Build URL for the translation
+      const [translationLang, ...translationSlugParts] = translation.id.split('/');
+      const translationSlug = translationSlugParts.join('/').replace(/\/index\.(md|mdx)$/, '');
+      return `/${translationLang}/blog/${translationSlug}`;
+    } else {
+      // No translation available
+      return null;
+    }
+  }
+
+  // Default behavior for non-blog pages
   const pathParts = currentPath.split('/').filter(p => p);
 
   // If first part is a language code, remove it
@@ -23,16 +61,30 @@ const availableLanguages = Object.entries(languages);
 ---
 
 <div class="language-switcher">
-  {availableLanguages.map(([code, name]) => (
-    <a
-      href={switchLanguage(code)}
-      class={`lang-btn ${currentLang === code ? 'active' : ''}`}
-      aria-label={`Cambiar a ${name}`}
-      title={name}
-    >
-      {code.toUpperCase()}
-    </a>
-  ))}
+  {availableLanguages.map(([code, name]) => {
+    const url = switchLanguage(code);
+    const isDisabled = url === null && currentLang !== code;
+    const isActive = currentLang === code;
+
+    return isDisabled ? (
+      <span
+        class="lang-btn disabled"
+        aria-label={`${name} - No disponible`}
+        title={`${name} - No disponible`}
+      >
+        {code.toUpperCase()}
+      </span>
+    ) : (
+      <a
+        href={url || '#'}
+        class={`lang-btn ${isActive ? 'active' : ''}`}
+        aria-label={`Cambiar a ${name}`}
+        title={name}
+      >
+        {code.toUpperCase()}
+      </a>
+    );
+  })}
 </div>
 
 <style>
@@ -41,8 +93,8 @@ const availableLanguages = Object.entries(languages);
     gap: 0.25rem;
     align-items: center;
     padding: 0.25rem;
-    background: rgba(0, 217, 255, 0.05);
-    border: 1px solid var(--border-glow);
+    background: rgba(0, 107, 125, 0.15);
+    border: 1px solid rgba(0, 107, 125, 0.4);
     border-radius: 6px;
   }
 
@@ -61,22 +113,44 @@ const availableLanguages = Object.entries(languages);
   }
 
   .lang-btn:hover {
-    color: var(--cyan-neon);
-    background: rgba(0, 217, 255, 0.1);
-    border-color: var(--cyan-neon);
-    box-shadow: 0 0 10px var(--cyan-glow);
+    color: #00b8cc;
+    background: rgba(0, 107, 125, 0.2);
+    border-color: #008B9E;
+    box-shadow: 0 0 8px rgba(0, 139, 158, 0.4);
   }
 
   .lang-btn.active {
-    color: var(--bg-primary);
-    background: var(--cyan-neon);
-    border-color: var(--cyan-neon);
-    box-shadow: 0 0 15px var(--cyan-glow);
+    color: #ffffff;
+    background: #006B7D;
+    border-color: #008B9E;
+    box-shadow: 0 0 12px rgba(0, 107, 125, 0.5);
     pointer-events: none;
+  }
+
+  .lang-btn.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    color: var(--text-muted);
+    border-color: transparent;
+    background: rgba(0, 107, 125, 0.1);
+  }
+
+  .lang-btn.disabled:hover {
+    color: var(--text-muted);
+    background: rgba(0, 107, 125, 0.1);
+    border-color: transparent;
+    box-shadow: none;
+    transform: none;
   }
 
   /* Light mode adjustments */
   :root.light-mode .lang-btn.active {
-    color: #0a0e1a;
+    color: #ffffff;
+    background: #0088a0;
+  }
+
+  :root.light-mode .language-switcher {
+    background: rgba(0, 136, 160, 0.15);
+    border-color: rgba(0, 136, 160, 0.4);
   }
 </style>

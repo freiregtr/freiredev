@@ -17,6 +17,16 @@ export default defineConfig({
       },
     })
   ],
+  image: {
+    service: {
+      entrypoint: 'astro/assets/services/sharp',
+      config: {
+        limitInputPixels: false,
+      }
+    },
+    domains: [],
+    remotePatterns: [],
+  },
   i18n: {
     defaultLocale: 'es',
     locales: ['es', 'en'],

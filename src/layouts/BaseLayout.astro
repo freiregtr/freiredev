@@ -3,13 +3,16 @@ import '../styles/global.css';
 import LanguageSwitcher from '../components/LanguageSwitcher.astro';
 import { getLangFromUrl } from '../i18n/utils';
 import { ui } from '../i18n/ui';
+import type { CollectionEntry } from 'astro:content';
 
 interface Props {
   title: string;
   description?: string;
+  entryId?: string;
+  allPosts?: CollectionEntry<'blog'>[];
 }
 
-const { title, description = 'Blog personal de Ramon Freire sobre TypeScript, IoT, Programación y Linux' } = Astro.props;
+const { title, description = 'Blog personal de Ramon Freire sobre TypeScript, IoT, Programación y Linux', entryId, allPosts } = Astro.props;
 const lang = getLangFromUrl(Astro.url);
 
 // Generate hreflang URLs for current page
@@ -77,11 +80,13 @@ const alternateUrls = Object.keys(ui).map(langCode => ({
           <a href={`/${lang}`} class="nav-link">INICIO</a>
           <a href={`/${lang}/blog`} class="nav-link">BLOG</a>
           <a href={`/${lang}/categorias`} class="nav-link">CATEGORÍAS</a>
-          <LanguageSwitcher />
-          <label class="theme-switch">
-            <input type="checkbox" id="theme-toggle" />
-            <span class="slider"></span>
-          </label>
+          <div class="controls-grid">
+            <LanguageSwitcher entryId={entryId} allPosts={allPosts} />
+            <label class="theme-switch">
+              <input type="checkbox" id="theme-toggle" />
+              <span class="slider"></span>
+            </label>
+          </div>
         </div>
       </nav>
 
@@ -91,16 +96,18 @@ const alternateUrls = Object.keys(ui).map(langCode => ({
           <a href={`/${lang}`} class="mobile-link">INICIO</a>
           <a href={`/${lang}/blog`} class="mobile-link">BLOG</a>
           <a href={`/${lang}/categorias`} class="mobile-link">CATEGORÍAS</a>
-          <div class="mobile-lang-switch">
-            <span class="lang-label">IDIOMA</span>
-            <LanguageSwitcher />
-          </div>
-          <div class="mobile-theme-switch">
-            <span class="theme-label">TEMA</span>
-            <label class="theme-switch">
-              <input type="checkbox" id="theme-toggle-mobile" />
-              <span class="slider"></span>
-            </label>
+          <div class="mobile-controls-wrapper">
+            <div class="mobile-lang-switch">
+              <span class="lang-label">IDIOMA</span>
+              <LanguageSwitcher entryId={entryId} allPosts={allPosts} />
+            </div>
+            <div class="mobile-theme-switch">
+              <span class="theme-label">TEMA</span>
+              <label class="theme-switch">
+                <input type="checkbox" id="theme-toggle-mobile" />
+                <span class="slider"></span>
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -126,7 +133,6 @@ const alternateUrls = Object.keys(ui).map(langCode => ({
 
     <script>
       // Navbar shrink on scroll
-      let lastScroll = 0;
       const header = document.querySelector('.header-tron');
 
       window.addEventListener('scroll', () => {
@@ -137,8 +143,6 @@ const alternateUrls = Object.keys(ui).map(langCode => ({
         } else {
           header?.classList.remove('scrolled');
         }
-
-        lastScroll = currentScroll;
       });
 
       // Hamburger menu
@@ -297,12 +301,17 @@ const alternateUrls = Object.keys(ui).map(langCode => ({
     font-family: var(--font-primary);
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--cyan-neon);
-    text-shadow: 0 0 20px var(--cyan-glow);
+    color: #008B9E;
+    text-shadow: 0 0 15px rgba(0, 139, 158, 0.6);
     letter-spacing: 0.1em;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
+  }
+
+  .logo:hover {
+    color: #00a8bf;
+    text-shadow: 0 0 20px rgba(0, 168, 191, 0.7);
   }
 
   .header-tron.scrolled .logo {
@@ -373,12 +382,20 @@ const alternateUrls = Object.keys(ui).map(langCode => ({
   }
 
   .nav-link:hover {
-    color: var(--cyan-neon);
-    text-shadow: 0 0 10px var(--cyan-glow);
+    color: #00a8bf;
+    text-shadow: 0 0 10px rgba(0, 168, 191, 0.6);
   }
 
   .nav-link:hover::before {
     width: 100%;
+  }
+
+  /* Controls Grid - Agrupa Language Switcher y Theme Switch */
+  .controls-grid {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 1rem;
+    align-items: center;
   }
 
   /* Theme Switch estilo iPhone */
@@ -387,7 +404,7 @@ const alternateUrls = Object.keys(ui).map(langCode => ({
     display: inline-block;
     width: 60px;
     height: 30px;
-    margin-left: 1.5rem;
+    margin-left: 0;
   }
 
   .theme-switch input {
@@ -403,11 +420,11 @@ const alternateUrls = Object.keys(ui).map(langCode => ({
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.2);
-    border: 2px solid var(--cyan-neon);
+    background: rgba(0, 107, 125, 0.3);
+    border: 2px solid #006B7D;
     transition: all 0.4s ease;
     border-radius: 30px;
-    box-shadow: 0 0 10px var(--cyan-glow);
+    box-shadow: 0 0 8px rgba(0, 107, 125, 0.4);
   }
 
   .slider:before {
@@ -417,15 +434,15 @@ const alternateUrls = Object.keys(ui).map(langCode => ({
     width: 22px;
     left: 2px;
     bottom: 2px;
-    background: var(--cyan-neon);
+    background: #008B9E;
     transition: all 0.4s ease;
     border-radius: 50%;
-    box-shadow: 0 0 15px var(--cyan-neon);
+    box-shadow: 0 0 10px rgba(0, 139, 158, 0.6);
   }
 
   input:checked + .slider {
-    background: var(--cyan-neon);
-    box-shadow: 0 0 20px var(--cyan-neon);
+    background: #006B7D;
+    box-shadow: 0 0 15px rgba(0, 107, 125, 0.5);
   }
 
   input:checked + .slider:before {
@@ -435,7 +452,8 @@ const alternateUrls = Object.keys(ui).map(langCode => ({
   }
 
   .slider:hover {
-    box-shadow: 0 0 25px var(--cyan-neon);
+    box-shadow: 0 0 20px rgba(0, 107, 125, 0.6);
+    border-color: #008B9E;
   }
 
   /* Light Mode */
@@ -705,13 +723,21 @@ const alternateUrls = Object.keys(ui).map(langCode => ({
     margin-right: 0.5rem;
   }
 
+  .mobile-controls-wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(0, 107, 125, 0.3);
+    width: 100%;
+  }
+
   .mobile-lang-switch {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 1rem;
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--grid-line);
   }
 
   .lang-label {
@@ -725,10 +751,8 @@ const alternateUrls = Object.keys(ui).map(langCode => ({
   .mobile-theme-switch {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 1rem;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--grid-line);
   }
 
   .theme-label {
@@ -761,6 +785,13 @@ const alternateUrls = Object.keys(ui).map(langCode => ({
 
     .nav-links {
       display: none;
+    }
+
+    .controls-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      width: 100%;
+      justify-items: center;
     }
 
     .main-content {

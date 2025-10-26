@@ -1,0 +1,162 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import { normalizeTag } from '../../../utils/tags';
+import { ui } from '../../../i18n/ui';
+import '../../../styles/tag-page.css';
+
+export async function getStaticPaths() {
+  const languages = Object.keys(ui);
+  const paths = [];
+
+  for (const lang of languages) {
+    // Get all posts for this language
+    const allPosts = await getCollection('blog', ({ id, data }) => {
+      const [postLang] = id.split('/');
+      return data.draft !== true && postLang === lang;
+    });
+
+    // Get all unique tags
+    const tags = new Set<string>();
+    allPosts.forEach(post => {
+      if (post.data.tags) {
+        post.data.tags.forEach((tag: string) => tags.add(normalizeTag(tag)));
+      }
+    });
+
+    // Create paths for each tag
+    tags.forEach(tag => {
+      paths.push({
+        params: { lang, tag },
+        props: { lang, tag }
+      });
+    });
+  }
+
+  return paths;
+}
+
+const { lang, tag } = Astro.params;
+
+// Validate language
+if (!(lang in ui)) {
+  return Astro.redirect('/es');
+}
+
+// Get all posts with this tag for this language
+const allPosts = await getCollection('blog', ({ id, data }) => {
+  const [postLang] = id.split('/');
+  return data.draft !== true && postLang === lang;
+});
+
+const postsWithTag = allPosts
+  .filter(post =>
+    post.data.tags &&
+    post.data.tags.some((t: string) => normalizeTag(t) === tag)
+  )
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// Helper function to remove language prefix from id
+function getSlugWithoutLang(id: string): string {
+  const [, ...rest] = id.split('/');
+  return rest.join('/').replace(/\/index\.(md|mdx)$/, '');
+}
+
+const categoryColors: Record<string, string> = {
+  typescript: '#00d9ff',
+  iot: '#ff6b35',
+  programacion: '#6fc3df',
+  'patrones-de-diseno': '#6fc3df',
+  'design-patterns': '#6fc3df',
+  linux: '#ffd700'
+};
+---
+
+<BaseLayout title={`${lang === 'es' ? 'Etiqueta' : 'Tag'}: ${tag}`}>
+  <div class="tag-page">
+    <div class="tag-header">
+      <h1 class="tag-title">
+        <span class="tag-symbol">#</span>
+        {tag}
+      </h1>
+      <p class="tag-count">
+        {postsWithTag.length} {lang === 'es' ? 'posts encontrados' : 'posts found'}
+      </p>
+    </div>
+
+    {postsWithTag.length > 0 ? (
+      <div class="posts-grid">
+        {postsWithTag.map((post) => {
+          const postSlug = getSlugWithoutLang(post.id);
+          const categoryColor = categoryColors[post.data.category] || '#6fc3df';
+
+          return (
+            <article class="post-card" data-href={`/${lang}/blog/${postSlug}`}>
+              <div class="card-glow" style={`background: linear-gradient(90deg, transparent, ${categoryColor}, transparent)`}></div>
+
+              {post.data.heroImage && (
+                <div class="card-image-wrapper">
+                  <Image src={post.data.heroImage} alt={post.data.title} class="card-image" />
+                  <div class="card-image-overlay"></div>
+                </div>
+              )}
+
+              <div class="card-content">
+                <div class="card-meta">
+                  <span class="card-category" style={`color: ${categoryColor}`}>
+                    [{post.data.category.toUpperCase()}]
+                  </span>
+                  <time class="card-date">
+                    {new Date(post.data.pubDate).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </time>
+                </div>
+
+                <h2 class="card-title">{post.data.title}</h2>
+
+                {post.data.description && (
+                  <p class="card-description">{post.data.description}</p>
+                )}
+
+                {post.data.tags && post.data.tags.length > 0 && (
+                  <div class="card-tags">
+                    {post.data.tags.slice(0, 3).map((t: string) => (
+                      <span class="card-tag">#{t}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    ) : (
+      <div class="no-posts">
+        <p>{lang === 'es' ? 'No hay posts con esta etiqueta' : 'No posts with this tag'}</p>
+      </div>
+    )}
+
+    <div class="back-link">
+      <a href={`/${lang}/blog`}>
+        <span class="back-arrow">←</span>
+        {lang === 'es' ? 'VOLVER AL BLOG' : 'BACK TO BLOG'}
+      </a>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  // Handle card clicks
+  document.querySelectorAll('.post-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const href = card.getAttribute('data-href');
+      if (href) {
+        window.location.href = href;
+      }
+    });
+  });
+</script>

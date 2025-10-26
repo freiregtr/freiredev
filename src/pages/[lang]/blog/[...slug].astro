@@ -36,8 +36,11 @@ if (!(lang in ui)) {
 }
 
 const { Content } = await render(entry);
+
+// Get all blog posts to find translations
+const allPosts = await getCollection('blog', ({ data }) => data.draft !== true);
 ---
 
-<BlogPost {...entry.data} slug={entry.id} lang={lang}>
+<BlogPost {...entry.data} slug={entry.id} lang={lang} entryId={entry.id} allPosts={allPosts}>
   <Content />
 </BlogPost>
