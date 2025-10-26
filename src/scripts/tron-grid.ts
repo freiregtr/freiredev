@@ -112,7 +112,7 @@ export function initTronGrid() {
 
   // Draw bike trail with fade effect
   function drawTrail(bike: Bike) {
-    if (bike.trail.length < 2) return;
+    if (!ctx || bike.trail.length < 2) return;
 
     const maxAge = (TRAIL_LENGTH * GRID_SIZE) / Math.abs(bike.speed);
 
@@ -143,6 +143,8 @@ export function initTronGrid() {
 
   // Animation loop
   function animate() {
+    if (!ctx) return;
+
     // Clear canvas completely (transparent)
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
