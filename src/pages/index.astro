@@ -4,17 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FreireDev</title>
+  <style>body{margin:0;padding:0;background:#0a0e1a;visibility:hidden}</style>
   <script>
-    // Read saved language preference and redirect
-    const savedLang = localStorage.getItem('preferred-language');
-    const targetLang = savedLang || 'es'; // Default to Spanish
-    window.location.replace(`/${targetLang}`);
+    // Instant redirect - executes before page renders
+    (function() {
+      const savedLang = localStorage.getItem('preferred-language');
+      const targetLang = savedLang || 'es';
+      window.location.replace('/' + targetLang);
+    })();
   </script>
   <noscript>
     <meta http-equiv="refresh" content="0; url=/es">
   </noscript>
 </head>
-<body>
-  <p style="font-family: monospace; text-align: center; margin-top: 2rem;">Redirecting...</p>
-</body>
+<body></body>
 </html>
