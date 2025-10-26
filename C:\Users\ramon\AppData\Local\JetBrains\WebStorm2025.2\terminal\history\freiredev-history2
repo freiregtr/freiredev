@@ -1,0 +1,545 @@
+git add .
+git commit -m "Fix MAG_COUNT calculation for flexible profiles to use max_count instead of defaulting to 1. This enables proper dual magnetometer configuration generation for FlightHelicopter profile allowing orchestrator to read MAG2 pipes and record complete dual magnetometer data"
+git push origin feature/14-add-logic-business-ads-orchestrator 
+git add .
+git commit -m "Add detailed MAG2 lifecycle logging to orchestrator and data processor. Logs MAG2 pipe registry initialization, reader setup, and data flow to mag2_lifecycle.log file for debugging dual magnetometer issues. This will help identify whether MAG2 pipes are registered, readers initialized, or data processor enabled for MAG2"
+git push origin feature/14-add-logic-business-ads-orchestrator 
+git add .
+git commit -m "Fix orchestrator profile detection to read from ProfileConfig.h instead of binary name. Added ProfileConfig include and modified determineProfile function to prioritize compiled profile defines over argv name parsing. Changed default from base_station to full_develop ensuring FlightHelicopter profile correctly uses dual magnetometer mode with MAG2 enabled"
+git push origin feature/14-add-logic-business-ads-orchestrator 
+git add .
+git commit -m "Copy BaseStationProfile logic to FullDevelopProfile replacing complex dual magnetometer code with proven single magnetometer auto-detection. Both profiles now use identical MAG1 priority MAG2 fallback logic that works reliably. Updated header to match single magnetometer structure with UnifiedDataProcessor integration"
+git push origin feature/14-add-logic-business-ads-orchestrator 
+git add .
+git commit -m "Implement adaptive dual magnetometer logic in FullDevelopProfile to use ALL detected magnetometers instead of single priority-based selection. Changed from single magReader to vector magReaders, modified configureMagnetometers to detect and configure both MAG1 and MAG2 simultaneously with separate callbacks, and updated enablement logic to activate all found magnetometers for complete dual magnetometer recording"
+git push origin feature/14-add-logic-business-ads-orchestrator 
+git add .
+git commit -m "Added flexible magnetometer mode to JSON configs. Updated generator and scripts to use MAGNETOMETER_MODE instead of fixed dual/single flags. System now adapts 1-2 mags based on runtime detection not compile time"
+git push origin feature/14-add-logic-business-ads-orchestrator 
+git add .
+git commit -m "Fixed method placement. Moved _cleanup_state_files from DaemonStartupWorker class to DaemonManager class where its called from start_daemons method"
+git push origin feature/14-add-logic-business-ads-orchestrator 
+node --version
+npm --version
+pwd 
+npx create-react-app my-ecommerce-app
+cd my-ecommerce-app/
+npm install react-bootstrap bootstrap
+pwd
+cd .
+pwd
+explorer .
+explorer "mnt/c/Users/ramon/my-ecommerce-app"
+pwd
+npm install react-bootstrap bootstrap
+npm start
+npm install react-bootstrap bootstrap
+npm audit fix --force
+npm install react-bootstrap bootstrap
+npm start
+npm install react-bootstrap bootstrap
+npm start
+npm install react-bootstrap bootstrap
+npm start
+npm install
+npm run
+npm start
+pwd
+claude
+pwd
+node --vbersion
+node --version
+npm --version
+npx create-react-app my-ecommerce-app
+pwd
+rm -rf my-ecommerce-app/
+npx create-react-app my-ecommerce-app
+cd my-ecommerce-app/
+npm install react-bootstrap bootstrap
+npm start
+mkdir src/components
+touch src/components/Navbar.js
+touch src/components/ProductList.js
+touch src/components/ShoppingCart.js
+touch src/components/RegistrationForm.js
+claude
+git add .
+git commit -m "Fix GPS TIME white background and performance issues by replacing findChild label structure with direct label creation like UTM values and optimizing update frequency with caching to prevent UI freezing after 20-30 seconds 2"
+git push origin feature/14-add-logic-business-ads-orchestrator 
+git add .
+git commit -m "Fix white background on GPS labels by forcing CSS refresh after setText operations to maintain transparent styling during frequent updates"
+git push origin feature/14-add-logic-business-ads-orchestrator 
+git add .
+git commit -m "Remove unsupported box-shadow CSS property causing application crash in toggle menu view"
+git push origin feature/14-add-logic-business-ads-orchestrator 
+git add .
+git commit -m "Fix GPS view white background issue by processing data updates in main Qt thread. Moved GPS data processing from pipe reader thread to main thread using QTimer and buffer to prevent Qt rendering issues when updating GUI from non-Qt threads"
+git push origin feature/14-add-logic-business-ads-orchestrator 
+git add .
+git commit -m "Fix QuSpin magnetometer detection by configuring serial port parameters. Added stty configuration (115200 8N1 raw mode) to hardware detector matching daemon setup, enabling proper data reading from QuSpin devices"
+git push origin feature/14-add-logic-business-ads-orchestrator 
+git add .
+git commit -m "Add sudo and simplify stty command for magnetometer port configuration. Changed to use sudo stty with simplified raw -echo parameters to ensure proper permissions and reliable port initialization"
+git push origin feature/14-add-logic-business-ads-orchestrator 
+git add .
+git commit -m "Clean up GPS view time display. Remove RTC time updates since no hardware RTC available and strip decimal seconds from GPS time for cleaner HH:MM:SS format"
+git push origin feature/14-add-logic-business-ads-orchestrator 
+git branch dev
+git checkout dev
+git pull
+git add .
+git commit -m "Add UTM coordinate conversion to GPS view. Fix syntax errors in GPS handler integration and implement complete lat/lon to UTM transformation using pyproj library. GPS view now displays zone sector, easting and northing coordinates with proper formatting and handles timeout scenarios. Resolves missing UTM functionality identified in GPS interface"
+git push origin feature/14-add-logic-business-ads-orchestrator 
+git add .
+git commit -m "Fix white background issue in GPS labels by removing responsive parameter. Remove responsive=True from all GPS display labels to match UTM values styling approach which prevents Qt rendering interference that caused unwanted white backgrounds on time and coordinate displays"
+git push origin feature/14-add-logic-business-ads-orchestrator 
+git add .
+git commit -m "Fix GPS label white backgrounds by adding explicit transparent background CSS for QLabel elements preventing Qt default styling on frequent updates"
+git push origin feature/14-add-logic-business-ads-orchestrator 
+git add .
+git commit -m "Fix GPS TIME white background and performance issues by replacing findChild label structure with direct label creation like UTM values and optimizing update frequency with caching to prevent UI freezing after 20-30 seconds"
+git push origin feature/14-add-logic-business-ads-orchestrator 
+git branch
+git checkout feature/14-add-logic-business-ads-orchestrator 
+git pull
+git branch
+git checkoud dev
+git checkout dev
+git pull
+git add .
+git commit -m "update README for installation package"
+git push origin dev
+git branch
+git checkout main 
+git pull
+git stash
+git pull
+find daemons -name "*.cpp" -exec git rm {} \;
+find daemons -name "*.h" -exec git rm {} \;
+git rm -rf daemons/profiles daemons/writers daemons/common daemons/sensors daemons/processors
+git add .
+git commit -m "cleanup: remove source code from production"
+git push origin main
+git checkout dev
+git add .
+git commit -m "adiciosn de comentarios en secciones donde el codigo necesitar ser explicado, paso a paso"
+git push origin main
+claude doctor
+claude
+git add 06-Semana-6-disenando-web-responsivas/actividades
+git commit -m "adicion de archivos de duoc semana 7"
+git push origin main
+git add .
+git reset
+git add 06-Semana-6-disenando-web-responsivas/01-props-state-react.md
+git commit -m "adicion de caso 1 props state react"
+git push origin main
+git add 06-Semana-6-disenando-web-responsivas/README.md
+git commit -m "adicion de readme general unidad 2.2"
+git push origin main
+git add 06-Semana-6-disenando-web-responsivas/02-persistencia-javascript.md
+git commit -m "adicion de caso 2 persistencia javascript react"
+git push origin main
+git add .
+git reset
+git add 06-Semana-6-disenando-web-responsivas/03-navegacion-react-router.md
+git commit -m "adicion archivo react route"
+git oush origin main
+git push origin main
+claude
+pwd
+ls -la
+cd src
+ls
+git add Semana5
+git commit -m "adicion semana 5"
+git push origin main
+claude
+cd ..
+cd DataLogger-Refactoring-system/
+cd dae
+ls -la
+git checkout 14
+git branch
+sudo apt install qt6-base-dev qt6-tools-dev qt6-tools-dev-tools
+pwd
+cd ..
+cd QuspinConfig/
+sudo apt install qt6-base-dev qt6-tools-dev
+mkdir build && cd build
+cmake ..
+make
+ls -la
+./QuspinConfig
+cmake ..
+cd ..
+ls -la
+rm -rf build/
+mkdir build
+cd build/
+cmake ..
+make
+cd ..
+rm -rf build/
+mkdir build
+cd build/
+cmake ..
+make
+cmake ..
+make
+ls -la
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+ls -la
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+ls -la
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+pwd
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+sudo apt install libqt6serialport6-dev
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+./QuspinConfig
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+pwd
+cd ..
+git init
+git add .
+git commit -m "Initial commit: QuSpin QTFM Gen-2 configuration tool
+git commit -m "Initial commit: QuSpin QTFM Gen-2 configuration tool"
+git remote add origin git@github.com:New-Sense-Geophysics/QuspinConfig.git
+git branch -M main
+git push -u origin main
+pwd
+cd ..
+cd dev
+cd trabajo/
+cd QuspinConfig/
+ls -la
+git push -u origin main
+rm -rf .git
+git init
+git add .
+git commit -m "Initial commit: QuSpin QTFM Gen-2 configuration tool"
+git remote add origin git@github.com:New-Sense-Geophysics/QuspinConfig.git
+git branch -M main
+git push -u origin main
+git remote add origin git@github-trabajo:New-Sense-Geophysics/QuspinConfig.git
+rm -rf .git
+git init
+git add .
+git commit -m "Initial commit: QuSpin QTFM Gen-2 configuration tool"
+git remote add origin git@github-trabajo:New-Sense-Geophysics/QuspinConfig.git
+git branch -M main
+git push -u origin main
+pwd
+git add .
+git commit -m "add limit of 5 seconds in view"
+git push origin main
+git add .
+git commit -m "upgrade 5 seconds view to more efficient data flow"
+git push origin main
+git add .
+git commit -m "Implemented RAW DATA, PIPE DATA, and QUSPIN DATA FORMAT tabs. Added status LEDs for sensor state. Integrated QuSpinParser and SerialReader with 3-second rolling buffer using Qt native setMaximumBlockCount for optimal 250Hz performance"
+git push origin main
+git add .
+git commit -m "Fixed performance issue where all 4 tabs were rendering simultaneously at 250Hz (1000 UI updates/s). Now only the active tab updates, reducing CPU load by 75% and maintaining fluid 250Hz visualization without progressive slowdown"
+git push origin main
+git add .
+git commit -m "Changed all monitors from QTextEdit to QPlainTextEdit. QTextEdit is for rich-text documents while QPlainTextEdit is optimized for plain-text consoles like PuTTY, providing significantly better performance at 250Hz data rates"
+git push origin main
+git add .
+git commit -m "fix: change QTextEdit to QPlainTextEdit for console performance and add tab-based rendering to reduce UI operations from 750/s to 250/s at 250Hz data rate"
+git push origin main
+git add .
+git commit -m "fix: change QTextEdit to QPlainTextEdit for console performance and add tab-based rendering to reduce UI operations from 750/s to 250/s at 250Hz data rate"
+git push origin main
+git add .
+git commit -m "fix: add QPlainTextEdit styles to maintain black background with white text after widget type change"
+git push origin main
+git add .
+git commit -m "implement 10Hz UI buffering to reduce updates from 250/s to 10/s, add LED state caching, and optimize tab 2 clear operations for 25x performance improvement at 250Hz data rate"
+git push origin main
+git branch
+git checkout dev
+git branch
+pwd
+ls -la
+cd .git
+cd build
+cmake ..
+make
+claude
+pwd
+claude
+cd build/
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+pwd
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+git add .
+git commit -m "add css value to quspin data format table"
+git push origin main
+cd ..
+git add .
+git commit -m "add css value to quspin data format table"
+git push origin main
+cd build/
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+git add .
+cd ..
+git add .
+git commit -m "add favorites to quspin cards"
+git push origin main
+git add .
+git commit -m "add port send function to send commands"
+git push origin main
+git add .
+git commit -m "add third option in message, INFO MESSAGE"
+git push origin main
+git add .
+git commit -m "clean data after one second in data format"
+git push origin main
+git add .
+git commit -m "modify navigation buttons"
+git push origin main
+cd build/
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+cmake ..
+make
+./QuspinConfig
+rm -rf *
+make
+cmake ..
+make
+./QuspinConfig
+make
+rm -rf *
+make
+rm -rf *
+make
+pwd
+git add 06-Semana-6-disenando-web-responsivas/04-parametros-url.md 06-Semana-6-disenando-web-responsivas/05-config-router.md 
+git commit -m "adicion de contenido parametros URL y confif router"
+git pull origin main 
+git push origin main
+pwd
+ls -la
+claude
+claude
+pwd
+npm create vite
+npm run dev
+cd 01-introduccion-javascript-typescript/
+npm run dev
+claude
+pwd
+cd src
+cd Semana5/
+ls
+git add 2.1.1\ Colecciones\ POO.pdf README.md 
+git commit -m "contenido semana 5"
+git push origin main
+cd ..
+cd Semana6/
+ls -la
+git add 2.2.1\ Herencia.pdf README.md 
+git commit -m "contenido semana 7"
+git push origin main
+pef
+pwd
+ls -la
+git add README.md 
+git commit -m "adicion semana 7 readme"
+git push origin main
+pwd
+cd ..
+cd Semana7/
+git add README.md 
+git commit -m "adicion semana 7 readme"
+git push origin main
+pwd
+ls -la
+rm -rf stickynotes/
+pwd
+cd 01-introduccion-javascript-typescript/
+npm run dev
+cd 07-Semana-7-repaso-tecnicas-react/
+cd stickynotes/
+npm run start
+claude
