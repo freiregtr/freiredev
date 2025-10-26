@@ -3,6 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { getAllSubcategories } from '../../utils/categories';
 import { Image } from 'astro:assets';
+import { normalizeTag } from '../../utils/tags';
+import { getSlugFromId } from '../../utils/posts';
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('blog', ({ data }) => {
@@ -87,7 +89,7 @@ const { posts, categorySlug, categoryName, categoryColor, parentCategory, curren
     <div class="posts-grid">
       {posts.map((post: CollectionEntry<'blog'>) => (
         <article class="post-card">
-          <a href={`/blog/${post.id}`} class="post-card-link">
+          <a href={`/blog/${getSlugFromId(post.id)}`} class="post-card-link">
             <div class="post-glow" style={`background: linear-gradient(90deg, transparent, ${categoryColor}, transparent)`}></div>
 
             {post.data.heroImage && (
@@ -125,7 +127,7 @@ const { posts, categorySlug, categoryName, categoryColor, parentCategory, curren
                 {post.data.tags && post.data.tags.length > 0 && (
                   <div class="post-tags">
                     {post.data.tags.slice(0, 3).map((tag: string) => (
-                      <span class="post-tag">#{tag}</span>
+                      <a href={`/tag/${normalizeTag(tag)}`} class="post-tag" onclick="event.stopPropagation()">#{tag}</a>
                     ))}
                   </div>
                 )}

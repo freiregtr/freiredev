@@ -3,6 +3,7 @@ import BaseLayout from './BaseLayout.astro';
 import type { CollectionEntry } from 'astro:content';
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
+import { normalizeTag } from '../utils/tags';
 
 type Props = CollectionEntry<'blog'>['data'] & { slug: string };
 
@@ -69,7 +70,7 @@ const postsByCategory = categories.map(cat => ({
       {tags && tags.length > 0 && (
         <div class="hero-tags">
           {tags.map((tag: string) => (
-            <span class="hero-tag">#{tag}</span>
+            <a href={`/tag/${normalizeTag(tag)}`} class="hero-tag">#{tag}</a>
           ))}
         </div>
       )}
@@ -247,8 +248,9 @@ const postsByCategory = categories.map(cat => ({
     height: 100%;
     background: linear-gradient(180deg,
       rgba(0, 0, 0, 0.3) 0%,
-      rgba(0, 0, 0, 0.7) 70%,
-      rgba(0, 0, 0, 0.95) 100%
+      rgba(0, 0, 0, 0.5) 40%,
+      rgba(0, 0, 0, 0.85) 70%,
+      rgba(0, 0, 0, 0.98) 100%
     );
     z-index: 1;
   }
@@ -317,6 +319,17 @@ const postsByCategory = categories.map(cat => ({
     border: 1px solid var(--grid-line);
     border-radius: 4px;
     backdrop-filter: blur(10px);
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+  }
+
+  .hero-tag:hover {
+    color: var(--cyan-neon);
+    background: rgba(0, 217, 255, 0.15);
+    border-color: var(--cyan-neon);
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+    transform: translateY(-2px);
   }
 
   /* Main Layout - 3 columnas */
@@ -786,7 +799,7 @@ const postsByCategory = categories.map(cat => ({
     }
 
     .hero-content-wrapper {
-      padding: 2rem 1rem;
+      padding: 2rem 1.5rem;
     }
 
     .content-wrapper {

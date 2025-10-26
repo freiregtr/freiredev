@@ -3,6 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { getAllCategories } from '../utils/categories';
 import { Image } from 'astro:assets';
+import { normalizeTag } from '../utils/tags';
+import { getSlugFromId } from '../utils/posts';
 
 const allPosts = await getCollection('blog', ({ data }) => {
   return data.draft !== true;
@@ -39,8 +41,8 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
       {latestPosts.map((post, index) => {
         const categoryInfo = categoryMap.get(post.data.category);
         return (
-          <div class={`carousel-slide ${index === 0 ? 'active' : ''}`} data-index={index}>
-            <a href={`/blog/${post.id}`} class="carousel-link">
+          <div class={`carousel-slide ${index === 0 ? 'active' : ''}`} data-index={index} data-href={`/blog/${getSlugFromId(post.id)}`}>
+            <div class="carousel-link">
               {post.data.heroImage && (
                 <div class="carousel-image-wrapper">
                   <Image src={post.data.heroImage} alt={post.data.title} class="carousel-image" />
@@ -75,14 +77,14 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
                     {post.data.tags && post.data.tags.length > 0 && (
                       <div class="carousel-tags">
                         {post.data.tags.slice(0, 3).map((tag: string) => (
-                          <span class="carousel-tag">#{tag}</span>
+                          <a href={`/tag/${normalizeTag(tag)}`} class="carousel-tag">#{tag}</a>
                         ))}
                       </div>
                     )}
                   </div>
                 </div>
               </div>
-            </a>
+            </div>
           </div>
         );
       })}
@@ -134,8 +136,8 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
             else if (index <= 2) cardClass = 'medium';
 
             return (
-              <article class={`island-card ${cardClass}`}>
-                <a href={`/blog/${post.id}`} class="card-link-wrapper">
+              <article class={`island-card ${cardClass}`} data-href={`/blog/${getSlugFromId(post.id)}`}>
+                <div class="card-link-wrapper">
                   <div class="card-glow" style={`background: linear-gradient(90deg, transparent, ${category.color}, transparent)`}></div>
 
                   {post.data.heroImage && (
@@ -175,13 +177,13 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
                       {(cardClass === 'featured' || cardClass === 'small') && post.data.tags && post.data.tags.length > 0 && (
                         <div class="card-tags">
                           {post.data.tags.slice(0, cardClass === 'small' ? 2 : 3).map((tag: string) => (
-                            <span class="card-tag">#{tag}</span>
+                            <a href={`/tag/${normalizeTag(tag)}`} class="card-tag">#{tag}</a>
                           ))}
                         </div>
                       )}
                     </div>
                   </div>
-                </a>
+                </div>
               </article>
             );
           })}
@@ -232,6 +234,7 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
     text-decoration: none;
     color: inherit;
     position: relative;
+    cursor: pointer;
   }
 
   .carousel-image-wrapper {
@@ -405,6 +408,16 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
     border: 1px solid var(--cyan-neon);
     border-radius: 4px;
     text-shadow: 0 0 10px var(--cyan-glow);
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+  }
+
+  .carousel-tag:hover {
+    background: rgba(0, 217, 255, 0.25);
+    border-color: var(--cyan-bright);
+    box-shadow: 0 0 20px var(--cyan-neon);
+    transform: translateY(-2px);
   }
 
   /* Controles del carrusel - Minimalistas */
@@ -436,11 +449,11 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
   }
 
   .carousel-control.prev {
-    left: 0;
+    left: -0.5rem;
   }
 
   .carousel-control.next {
-    right: 0;
+    right: -0.5rem;
   }
 
   .carousel-control:hover {
@@ -455,7 +468,7 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
   /* Indicadores */
   .carousel-indicators {
     position: absolute;
-    bottom: 2rem;
+    bottom: 1rem;
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
@@ -598,6 +611,7 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
     overflow: hidden;
     transition: all 0.4s ease;
     height: 100%;
+    background: linear-gradient(135deg, rgba(10, 14, 26, 0.95), rgba(20, 24, 36, 0.95));
   }
 
   .card-link-wrapper {
@@ -606,6 +620,7 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
     height: 100%;
     text-decoration: none;
     color: inherit;
+    cursor: pointer;
   }
 
   .island-card:hover {
@@ -717,7 +732,7 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
     opacity: 1;
     transition: all 0.5s ease;
     pointer-events: none;
-    z-index: 2;
+    z-index: 3;
   }
 
   .featured .card-title-small {
@@ -806,6 +821,7 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
     line-height: 1.3;
     color: #ffffff;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    margin: 0;
   }
 
   .featured .card-title-small .card-title {
@@ -868,6 +884,16 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
     border: 1px solid var(--cyan-neon);
     border-radius: 3px;
     text-shadow: 0 0 10px var(--cyan-glow);
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+  }
+
+  .card-tag:hover {
+    background: rgba(0, 217, 255, 0.25);
+    border-color: var(--cyan-bright);
+    box-shadow: 0 0 15px var(--cyan-neon);
+    transform: translateY(-1px);
   }
 
   .small .card-tag {
@@ -1239,5 +1265,37 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
     } else {
       startAutoPlay();
     }
+  });
+
+  // Manejar clicks en las cards
+  document.querySelectorAll('.island-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      // Si el click fue en un tag, no navegar a la card
+      if ((e.target as HTMLElement).closest('.card-tag')) {
+        return;
+      }
+      // Navegar al post
+      const href = card.getAttribute('data-href');
+      if (href) {
+        window.location.href = href;
+      }
+    });
+  });
+
+  // Manejar clicks en el carrusel
+  document.querySelectorAll('.carousel-slide').forEach(slide => {
+    slide.addEventListener('click', (e) => {
+      // Si el click fue en un tag o control, no navegar
+      if ((e.target as HTMLElement).closest('.carousel-tag') ||
+          (e.target as HTMLElement).closest('.carousel-control') ||
+          (e.target as HTMLElement).closest('.carousel-indicator')) {
+        return;
+      }
+      // Navegar al post
+      const href = slide.getAttribute('data-href');
+      if (href) {
+        window.location.href = href;
+      }
+    });
   });
 </script>

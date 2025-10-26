@@ -1,0 +1,73 @@
+---
+interface Props {
+  language?: string;
+  code?: string;
+  title?: string;
+}
+
+const {
+  language = 'python',
+  code = '# Escribe tu código aquí\nprint("Hello, World!")',
+  title = 'Code Playground'
+} = Astro.props;
+
+// Import styles
+import '../styles/code-playground.css';
+---
+
+<div class="code-playground">
+  <div class="playground-header">
+    <div class="header-left">
+      <span class="playground-icon">{'</>'}</span>
+      <h3 class="playground-title">{title}</h3>
+    </div>
+    <div class="header-right">
+      <select class="language-selector" id="language-select">
+        <option value="python" selected={language === 'python'}>Python</option>
+        <option value="javascript" selected={language === 'javascript'}>JavaScript</option>
+        <option value="typescript" selected={language === 'typescript'}>TypeScript</option>
+        <option value="java" selected={language === 'java'}>Java</option>
+        <option value="cpp" selected={language === 'cpp'}>C++</option>
+        <option value="c" selected={language === 'c'}>C</option>
+        <option value="rust" selected={language === 'rust'}>Rust</option>
+        <option value="go" selected={language === 'go'}>Go</option>
+      </select>
+      <button class="run-button" id="run-code">
+        <span class="button-icon">▶</span>
+        <span class="button-text">Ejecutar</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="playground-body">
+    <div class="editor-wrapper">
+      <div class="editor-header">
+        <span class="editor-label">Editor</span>
+      </div>
+      <div id="code-editor" data-initial-code={code} data-language={language}></div>
+    </div>
+
+    <div class="output-wrapper collapsed">
+      <div class="output-header">
+        <span class="output-label">Output</span>
+        <div class="output-header-right">
+          <span class="output-status" id="output-status"></span>
+          <button class="toggle-output" id="toggle-output" title="Expandir/Colapsar output">
+            <span class="toggle-icon">►</span>
+          </button>
+        </div>
+      </div>
+      <div class="output-content" id="output-content">
+        <div class="output-placeholder">
+          <span class="placeholder-icon">⚡</span>
+          <p>Presiona "Ejecutar" para ver el resultado</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { initCodePlayground } from '../scripts/code-playground';
+  initCodePlayground();
+</script>

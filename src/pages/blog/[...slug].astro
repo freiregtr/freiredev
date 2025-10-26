@@ -8,7 +8,7 @@ export async function getStaticPaths() {
   });
 
   return blogEntries.map(entry => ({
-    params: { slug: entry.id },
+    params: { slug: entry.id.replace(/\/index\.(md|mdx)$/, '') },
     props: { entry },
   }));
 }

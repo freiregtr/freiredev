@@ -9,6 +9,8 @@ heroImage: "./hero.jpg"
 draft: false
 ---
 
+import CodePlayground from '../../../../../components/CodePlayground.astro';
+
 # Patrón Singleton
 
 ## Conceptos clave
@@ -215,3 +217,37 @@ En aplicaciones React, Vue o Angular, usa los sistemas de gestión de estado int
 ## Conclusión
 
 El patrón Singleton es útil cuando necesitas garantizar una única instancia, pero debe usarse con precaución. En aplicaciones modernas, considera alternativas como inyección de dependencias o gestión de estado centralizada que ofrecen más flexibilidad y facilitan el testing.
+
+## Prueba el código
+
+Aquí puedes probar una implementación del patrón Singleton en Python. Prueba crear múltiples instancias y verifica que todas son la misma:
+
+<CodePlayground
+  language="python"
+  title="Singleton en Python"
+  code={`class Singleton:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            print("Creando nueva instancia...")
+            cls._instance = super().__new__(cls)
+        else:
+            print("Retornando instancia existente")
+        return cls._instance
+
+    def __init__(self):
+        self.value = "Soy un Singleton"
+
+# Prueba
+print("Primera llamada:")
+s1 = Singleton()
+print(f"ID de s1: {id(s1)}")
+
+print("\\nSegunda llamada:")
+s2 = Singleton()
+print(f"ID de s2: {id(s2)}")
+
+print(f"\\n¿Son la misma instancia? {s1 is s2}")
+print(f"Valor: {s1.value}")`}
+/>
