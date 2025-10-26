@@ -407,48 +407,49 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
     text-shadow: 0 0 10px var(--cyan-glow);
   }
 
-  /* Controles del carrusel */
+  /* Controles del carrusel - Minimalistas */
   .carousel-control {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     z-index: 10;
-    background: rgba(0, 217, 255, 0.1);
-    border: 2px solid var(--cyan-neon);
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
+    background: transparent;
+    border: none;
+    width: auto;
+    height: auto;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
+    opacity: 0.4;
+    padding: 0.5rem;
   }
 
   .carousel-control span {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: 4rem;
+    font-weight: 300;
     color: var(--cyan-neon);
     line-height: 1;
+    text-shadow: 0 2px 8px rgba(0, 217, 255, 0.5);
+    transition: all 0.3s ease;
   }
 
   .carousel-control.prev {
-    left: 2rem;
+    left: 0;
   }
 
   .carousel-control.next {
-    right: 2rem;
+    right: 0;
   }
 
   .carousel-control:hover {
-    background: var(--cyan-neon);
-    box-shadow: 0 0 30px var(--cyan-neon);
-    transform: translateY(-50%) scale(1.1);
+    opacity: 1;
+    transform: translateY(-50%) scale(1.15);
   }
 
   .carousel-control:hover span {
-    color: var(--bg-primary);
+    text-shadow: 0 0 20px var(--cyan-neon);
   }
 
   /* Indicadores */
@@ -1125,20 +1126,20 @@ const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
     }
 
     .carousel-control {
-      width: 40px;
-      height: 40px;
+      padding: 0.25rem;
+      opacity: 0.6;
     }
 
     .carousel-control span {
-      font-size: 1.75rem;
+      font-size: 2.5rem;
     }
 
     .carousel-control.prev {
-      left: 0.75rem;
+      left: 0;
     }
 
     .carousel-control.next {
-      right: 0.75rem;
+      right: 0;
     }
 
     .carousel-indicators {
