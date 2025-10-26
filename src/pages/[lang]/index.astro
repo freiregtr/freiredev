@@ -1,0 +1,1323 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { getAllCategories } from '../../utils/categories';
+import { Image } from 'astro:assets';
+import { normalizeTag } from '../../utils/tags';
+import { ui } from '../../i18n/ui';
+
+export async function getStaticPaths() {
+  const languages = Object.keys(ui);
+  return languages.map(lang => ({
+    params: { lang }
+  }));
+}
+
+const { lang } = Astro.params;
+
+// Validate language
+if (!(lang in ui)) {
+  return Astro.redirect('/es');
+}
+
+// Helper function to remove language prefix from id
+function getSlugWithoutLang(id: string): string {
+  const [, ...rest] = id.split('/');
+  return rest.join('/').replace(/\/index\.(md|mdx)$/, '');
+}
+
+// Get all posts for this language
+const allPosts = await getCollection('blog', ({ id, data }) => {
+  const [postLang] = id.split('/');
+  return data.draft !== true && postLang === lang;
+});
+
+// Obtener los últimos 5 posts para el carrusel
+const latestPosts = allPosts
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 5);
+
+// Obtener todas las categorías dinámicamente
+const categories = getAllCategories(allPosts);
+
+const categoryData = categories.map(category => {
+  const posts = allPosts
+    .filter(post => post.data.category === category.slug)
+    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+    .slice(0, 6);
+
+  return {
+    ...category,
+    posts
+  };
+});
+
+// Crear un mapa para acceso rápido por slug
+const categoryMap = new Map(categories.map(cat => [cat.slug, cat]));
+---
+
+<BaseLayout title="FreireDev - Blog de Tecnología">
+  <!-- Carrusel Hero -->
+  <div class="carousel-hero">
+    <div class="carousel-container">
+      {latestPosts.map((post, index) => {
+        const categoryInfo = categoryMap.get(post.data.category);
+        return (
+          <div class={`carousel-slide ${index === 0 ? 'active' : ''}`} data-index={index} data-href={`/${lang}/blog/${getSlugWithoutLang(post.id)}`}>
+            <div class="carousel-link">
+              {post.data.heroImage && (
+                <div class="carousel-image-wrapper">
+                  <Image src={post.data.heroImage} alt={post.data.title} class="carousel-image" />
+                  <div class="carousel-overlay"></div>
+                  <div class="carousel-overlay-hover"></div>
+                </div>
+              )}
+
+              <div class="carousel-content">
+                {/* Título pequeño - visible sin hover */}
+                <div class="carousel-title-small">
+                  <h2 class="carousel-title">{post.data.title}</h2>
+                </div>
+
+                {/* Contenido completo - visible con hover */}
+                <div class="carousel-full-content">
+                  {categoryInfo && (
+                    <div class="carousel-category" style={`color: ${categoryInfo.color}; text-shadow: 0 0 20px ${categoryInfo.color}`}>
+                      [{post.data.category.toUpperCase()}]
+                    </div>
+                  )}
+                  <h2 class="carousel-title">{post.data.title}</h2>
+                  <p class="carousel-description">{post.data.description}</p>
+                  <div class="carousel-meta">
+                    <time class="carousel-date">
+                      {new Date(post.data.pubDate).toLocaleDateString('es-ES', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </time>
+                    {post.data.tags && post.data.tags.length > 0 && (
+                      <div class="carousel-tags">
+                        {post.data.tags.slice(0, 3).map((tag: string) => (
+                          <a href={`/${lang}/tag/${normalizeTag(tag)}`} class="carousel-tag">#{tag}</a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+
+    <!-- Indicadores -->
+    <div class="carousel-indicators">
+      {latestPosts.map((_, index) => (
+        <button
+          class={`carousel-indicator ${index === 0 ? 'active' : ''}`}
+          data-index={index}
+          aria-label={`Ir a slide ${index + 1}`}
+        ></button>
+      ))}
+    </div>
+
+    <!-- Controles -->
+    <button class="carousel-control prev" aria-label="Anterior">
+      <span>‹</span>
+    </button>
+    <button class="carousel-control next" aria-label="Siguiente">
+      <span>›</span>
+    </button>
+  </div>
+
+  <!-- Islas por Categoría -->
+  {categoryData.map((category) => {
+    if (category.posts.length === 0) return null;
+
+    return (
+      <section class="category-island">
+        <div class="island-header">
+          <div class="island-title-wrapper">
+            <h2 class="island-title" style={`color: ${category.color}`}>
+              {category.name}
+            </h2>
+          </div>
+          <a href={`/${lang}/categoria/${category.slug}`} class="island-more" style={`border-color: ${category.color}; color: ${category.color}`}>
+            MÁS
+            <span class="more-arrow">→</span>
+          </a>
+        </div>
+
+        <div class="island-grid">
+          {category.posts.map((post, index) => {
+            // 1 destacado (index 0), 2 medianos (1-2), 3 pequeños (3-5)
+            let cardClass = 'small';
+            if (index === 0) cardClass = 'featured';
+            else if (index <= 2) cardClass = 'medium';
+
+            return (
+              <article class={`island-card ${cardClass}`} data-href={`/${lang}/blog/${getSlugWithoutLang(post.id)}`}>
+                <div class="card-link-wrapper">
+                  <div class="card-glow" style={`background: linear-gradient(90deg, transparent, ${category.color}, transparent)`}></div>
+
+                  {post.data.heroImage && (
+                    <div class="card-image-wrapper">
+                      <Image src={post.data.heroImage} alt={post.data.title} class="card-image" />
+                      <div class="card-image-overlay"></div>
+                      <div class="card-image-overlay-hover"></div>
+                    </div>
+                  )}
+
+                  <div class="card-content">
+                    {/* Título pequeño - visible sin hover */}
+                    <div class="card-title-small">
+                      <h3 class="card-title">{post.data.title}</h3>
+                    </div>
+
+                    {/* Contenido completo - visible con hover */}
+                    <div class="card-full-content">
+                      <div class="card-meta">
+                        <span class="card-category" style={`color: ${category.color}`}>
+                          [{category.slug.toUpperCase()}]
+                        </span>
+                        <time class="card-date">
+                          {new Date(post.data.pubDate).toLocaleDateString('es-ES', {
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </time>
+                      </div>
+
+                      <h3 class="card-title">{post.data.title}</h3>
+
+                      {(cardClass === 'featured' || cardClass === 'small') && post.data.description && (
+                        <p class="card-description">{post.data.description}</p>
+                      )}
+
+                      {(cardClass === 'featured' || cardClass === 'small') && post.data.tags && post.data.tags.length > 0 && (
+                        <div class="card-tags">
+                          {post.data.tags.slice(0, cardClass === 'small' ? 2 : 3).map((tag: string) => (
+                            <a href={`/${lang}/tag/${normalizeTag(tag)}`} class="card-tag">#{tag}</a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+    );
+  })}
+</BaseLayout>
+
+<style>
+  /* Carrusel Hero */
+  .carousel-hero {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+    margin-bottom: 4rem;
+    border-bottom: 2px solid var(--cyan-neon);
+    box-shadow: 0 5px 30px rgba(0, 217, 255, 0.3);
+  }
+
+  .carousel-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .carousel-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    pointer-events: none;
+  }
+
+  .carousel-slide.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .carousel-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .carousel-image-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .carousel-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 8s ease-out;
+  }
+
+  .carousel-slide.active .carousel-image {
+    transform: scale(1.1);
+  }
+
+  .carousel-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg,
+      rgba(10, 14, 26, 0.1) 0%,
+      rgba(10, 14, 26, 0.2) 60%,
+      rgba(10, 14, 26, 0.95) 100%
+    );
+    z-index: 1;
+  }
+
+  .carousel-overlay-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg,
+      rgba(10, 14, 26, 0.85) 0%,
+      rgba(10, 14, 26, 0.92) 50%,
+      rgba(10, 14, 26, 0.95) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    z-index: 1;
+  }
+
+  .carousel-slide:hover .carousel-overlay-hover {
+    opacity: 1;
+  }
+
+  .carousel-content {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+  }
+
+  /* Título pequeño del carrusel - visible sin hover */
+  .carousel-title-small {
+    position: absolute;
+    bottom: 3rem;
+    left: 2rem;
+    right: 2rem;
+    transform: translateY(0);
+    opacity: 1;
+    transition: all 0.5s ease;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .carousel-slide:hover .carousel-title-small {
+    transform: translateY(80px);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .carousel-title-small .carousel-title {
+    font-family: var(--font-primary);
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: 700;
+    line-height: 1.3;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    margin: 0;
+  }
+
+  /* Contenido completo del carrusel - visible con hover */
+  .carousel-full-content {
+    position: absolute;
+    bottom: 3rem;
+    left: 2rem;
+    right: 2rem;
+    transform: translateY(120px);
+    opacity: 0;
+    transition: all 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    z-index: 1;
+    max-width: 800px;
+  }
+
+  .carousel-slide:hover .carousel-full-content {
+    transform: translateY(0);
+    opacity: 1;
+    z-index: 3;
+  }
+
+  .carousel-category {
+    font-family: var(--font-primary);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .carousel-full-content .carousel-title {
+    font-family: var(--font-primary);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1.2;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    margin: 0;
+  }
+
+  .carousel-description {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .carousel-meta {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .carousel-date {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  .carousel-tags {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .carousel-tag {
+    font-size: 0.85rem;
+    color: var(--cyan-bright);
+    padding: 0.4rem 0.75rem;
+    background: rgba(0, 217, 255, 0.1);
+    border: 1px solid var(--cyan-neon);
+    border-radius: 4px;
+    text-shadow: 0 0 10px var(--cyan-glow);
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+  }
+
+  .carousel-tag:hover {
+    background: rgba(0, 217, 255, 0.25);
+    border-color: var(--cyan-bright);
+    box-shadow: 0 0 20px var(--cyan-neon);
+    transform: translateY(-2px);
+  }
+
+  /* Controles del carrusel - Minimalistas */
+  .carousel-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: transparent;
+    border: none;
+    width: auto;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0.4;
+    padding: 0.5rem;
+  }
+
+  .carousel-control span {
+    font-size: 4rem;
+    font-weight: 300;
+    color: var(--cyan-neon);
+    line-height: 1;
+    text-shadow: 0 2px 8px rgba(0, 217, 255, 0.5);
+    transition: all 0.3s ease;
+  }
+
+  .carousel-control.prev {
+    left: -0.5rem;
+  }
+
+  .carousel-control.next {
+    right: -0.5rem;
+  }
+
+  .carousel-control:hover {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.15);
+  }
+
+  .carousel-control:hover span {
+    text-shadow: 0 0 20px var(--cyan-neon);
+  }
+
+  /* Indicadores */
+  .carousel-indicators {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    gap: 1rem;
+  }
+
+  .carousel-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--cyan-neon);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .carousel-indicator.active {
+    background: var(--cyan-neon);
+    box-shadow: 0 0 20px var(--cyan-neon);
+    transform: scale(1.3);
+  }
+
+  .carousel-indicator:hover:not(.active) {
+    background: rgba(0, 217, 255, 0.5);
+    transform: scale(1.2);
+  }
+
+  /* Category Islands */
+  .category-island {
+    margin-bottom: 5rem;
+  }
+
+  .island-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--grid-line);
+  }
+
+  .island-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .island-icon {
+    font-family: var(--font-primary);
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-shadow: 0 0 15px currentColor;
+  }
+
+  .island-title {
+    font-family: var(--font-primary);
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 20px currentColor;
+  }
+
+  .island-more {
+    font-family: var(--font-primary);
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .island-more:hover {
+    background: currentColor;
+    color: var(--bg-primary) !important;
+    box-shadow: 0 0 20px currentColor;
+    transform: translateX(5px);
+  }
+
+  .more-arrow {
+    transition: transform 0.3s ease;
+  }
+
+  .island-more:hover .more-arrow {
+    transform: translateX(5px);
+  }
+
+  /* Island Grid - Layout 50/50 perfecto */
+  .island-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 160px 160px 160px;
+    gap: 1.5rem;
+  }
+
+  /* Featured (1) - Grande izquierda arriba, ocupa 2 columnas y 2 filas */
+  .island-card.featured {
+    grid-column: 1 / 3;
+    grid-row: 1 / 3;
+  }
+
+  /* Medium (2 y 3) - Pequeñas izquierda abajo, lado a lado */
+  .island-card.medium:nth-of-type(2) {
+    grid-column: 1 / 2;
+    grid-row: 3 / 4;
+  }
+
+  .island-card.medium:nth-of-type(3) {
+    grid-column: 2 / 3;
+    grid-row: 3 / 4;
+  }
+
+  /* Small (3) - Horizontales derecha, apiladas en 3 filas */
+  .island-card.small:nth-of-type(4) {
+    grid-column: 3 / 5;
+    grid-row: 1 / 2;
+  }
+
+  .island-card.small:nth-of-type(5) {
+    grid-column: 3 / 5;
+    grid-row: 2 / 3;
+  }
+
+  .island-card.small:nth-of-type(6) {
+    grid-column: 3 / 5;
+    grid-row: 3 / 4;
+  }
+
+  /* Island Card Styles - Con imagen de fondo */
+  .island-card {
+    position: relative;
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(10, 14, 26, 0.95), rgba(20, 24, 36, 0.95));
+  }
+
+  .card-link-wrapper {
+    position: relative;
+    display: block;
+    height: 100%;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .island-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 217, 255, 0.3);
+  }
+
+  .card-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 3;
+  }
+
+  .island-card:hover .card-glow {
+    opacity: 1;
+  }
+
+  /* Imagen de fondo que cubre toda la card */
+  .card-image-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .island-card:hover .card-image {
+    transform: scale(1.05);
+  }
+
+  /* Overlay que se oscurece en hover */
+  .card-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg,
+      rgba(10, 14, 26, 0.1) 0%,
+      rgba(10, 14, 26, 0.2) 60%,
+      rgba(10, 14, 26, 0.85) 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .card-image-overlay-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg,
+      rgba(10, 14, 26, 0.85) 0%,
+      rgba(10, 14, 26, 0.92) 50%,
+      rgba(10, 14, 26, 0.95) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .island-card:hover .card-image-overlay-hover {
+    opacity: 1;
+  }
+
+  /* Contenido sobre la imagen */
+  .card-content {
+    position: relative;
+    z-index: 2;
+    padding: 1.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+  }
+
+  .featured .card-content {
+    padding: 2rem;
+  }
+
+  .small .card-content {
+    padding: 1.25rem;
+  }
+
+  /* Wrapper para el título pequeño (sin hover) */
+  .card-title-small {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    right: 1.5rem;
+    transform: translateY(0);
+    opacity: 1;
+    transition: all 0.5s ease;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .featured .card-title-small {
+    bottom: 2rem;
+    left: 2rem;
+    right: 2rem;
+  }
+
+  .small .card-title-small {
+    bottom: 1.25rem;
+    left: 1.25rem;
+    right: 1.25rem;
+  }
+
+  .island-card:hover .card-title-small {
+    transform: translateY(80px);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Wrapper para el contenido completo (con hover) */
+  .card-full-content {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    right: 1.5rem;
+    transform: translateY(120px);
+    opacity: 0;
+    transition: all 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 1;
+    max-height: calc(100% - 3rem);
+    overflow: hidden;
+  }
+
+  .featured .card-full-content {
+    bottom: 2rem;
+    left: 2rem;
+    right: 2rem;
+    gap: 0.75rem;
+    max-height: calc(100% - 4rem);
+  }
+
+  .small .card-full-content {
+    bottom: 1.25rem;
+    left: 1.25rem;
+    right: 1.25rem;
+    gap: 0.4rem;
+    max-height: calc(100% - 2.5rem);
+  }
+
+  .island-card:hover .card-full-content {
+    transform: translateY(0);
+    opacity: 1;
+    z-index: 3;
+  }
+
+  /* Meta info */
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .card-category {
+    font-family: var(--font-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+
+  .card-date {
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+
+  /* Título pequeño - Solo visible sin hover */
+  .card-title-small .card-title {
+    font-family: var(--font-primary);
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    margin: 0;
+  }
+
+  .featured .card-title-small .card-title {
+    font-size: 1.25rem;
+  }
+
+  .small .card-title-small .card-title {
+    font-size: 0.85rem;
+  }
+
+  /* Título grande - Visible en hover */
+  .card-full-content .card-title {
+    font-family: var(--font-primary);
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  }
+
+  .featured .card-full-content .card-title {
+    font-size: 1.75rem;
+  }
+
+  .small .card-full-content .card-title {
+    font-size: 1rem;
+  }
+
+  /* Descripción */
+  .card-description {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .small .card-description {
+    font-size: 0.75rem;
+    line-height: 1.3;
+    -webkit-line-clamp: 2;
+  }
+
+  /* Tags */
+  .card-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: auto;
+  }
+
+  .card-tag {
+    font-size: 0.7rem;
+    color: var(--cyan-bright);
+    padding: 0.25rem 0.5rem;
+    background: rgba(0, 217, 255, 0.1);
+    border: 1px solid var(--cyan-neon);
+    border-radius: 3px;
+    text-shadow: 0 0 10px var(--cyan-glow);
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+  }
+
+  .card-tag:hover {
+    background: rgba(0, 217, 255, 0.25);
+    border-color: var(--cyan-bright);
+    box-shadow: 0 0 15px var(--cyan-neon);
+    transform: translateY(-1px);
+  }
+
+  .small .card-tag {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.4rem;
+  }
+
+  /* Light Mode - Ajustes de texto */
+  :root.light-mode .carousel-title-small .carousel-title {
+    color: #ffffff !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  :root.light-mode .card-title-small .card-title {
+    color: #ffffff !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  :root.light-mode .carousel-description,
+  :root.light-mode .card-description {
+    color: #ffffff !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  :root.light-mode .carousel-date,
+  :root.light-mode .card-date {
+    color: #e0e0e0 !important;
+  }
+
+  :root.light-mode .carousel-category,
+  :root.light-mode .card-category {
+    text-shadow: 0 0 10px currentColor !important;
+  }
+
+  /* Responsive - Tablet */
+  @media (max-width: 1024px) {
+    .island-grid {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(3, 200px);
+      gap: 1.25rem;
+    }
+
+    /* Reset todas las posiciones específicas del desktop */
+    .island-card.featured,
+    .island-card.medium:nth-of-type(2),
+    .island-card.medium:nth-of-type(3),
+    .island-card.small:nth-of-type(4),
+    .island-card.small:nth-of-type(5),
+    .island-card.small:nth-of-type(6) {
+      grid-column: auto;
+      grid-row: auto;
+    }
+
+    /* Touch: Mostrar contenido completo siempre (sin hover) */
+    .card-title-small {
+      opacity: 0;
+      transform: translateY(80px);
+    }
+
+    .card-full-content {
+      opacity: 1;
+      transform: translateY(0);
+      z-index: 3;
+    }
+
+    /* Overlay más suave en tablet para ver mejor la imagen */
+    .card-image-overlay-hover {
+      opacity: 0.75;
+      background: linear-gradient(180deg,
+        rgba(10, 14, 26, 0.5) 0%,
+        rgba(10, 14, 26, 0.7) 50%,
+        rgba(10, 14, 26, 0.85) 100%
+      );
+    }
+
+    /* Carrusel también */
+    .carousel-title-small {
+      opacity: 0;
+      transform: translateY(80px);
+    }
+
+    .carousel-full-content {
+      opacity: 1;
+      transform: translateY(0);
+      z-index: 3;
+    }
+
+    /* Overlay más suave en carrusel para tablet */
+    .carousel-overlay-hover {
+      opacity: 0.8;
+      background: linear-gradient(180deg,
+        rgba(10, 14, 26, 0.6) 0%,
+        rgba(10, 14, 26, 0.75) 50%,
+        rgba(10, 14, 26, 0.88) 100%
+      );
+    }
+  }
+
+  /* Responsive - Móvil */
+  @media (max-width: 768px) {
+    /* Grid de 1 columna */
+    .island-grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+      gap: 1rem;
+    }
+
+    /* Reset posiciones - todas en 1 columna */
+    .island-card.featured,
+    .island-card.medium:nth-of-type(2),
+    .island-card.medium:nth-of-type(3),
+    .island-card.small:nth-of-type(4),
+    .island-card.small:nth-of-type(5),
+    .island-card.small:nth-of-type(6) {
+      grid-column: 1;
+      grid-row: auto;
+    }
+
+    /* Cards más compactas en móvil */
+    .island-card {
+      min-height: 180px;
+      max-height: 180px;
+    }
+
+    .card-content {
+      padding: 1rem;
+    }
+
+    /* Ocultar título pequeño siempre */
+    .card-title-small {
+      display: none;
+    }
+
+    /* Mostrar solo info esencial */
+    .card-full-content {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+      z-index: 3 !important;
+      position: absolute;
+      bottom: 1rem;
+      left: 1rem;
+      right: 1rem;
+      gap: 0.5rem;
+    }
+
+    /* Ocultar descripción en móvil */
+    .card-description {
+      display: none;
+    }
+
+    /* Ocultar tags en móvil */
+    .card-tags {
+      display: none;
+    }
+
+    /* Solo mostrar título y categoría */
+    .card-full-content .card-title {
+      font-size: 0.95rem;
+      line-height: 1.2;
+    }
+
+    .card-meta {
+      font-size: 0.75rem;
+    }
+
+    .card-category {
+      font-size: 0.7rem;
+    }
+
+    .card-date {
+      font-size: 0.65rem;
+    }
+
+    /* Overlay más oscuro para mejor legibilidad */
+    .card-image-overlay-hover {
+      opacity: 0.85 !important;
+    }
+
+    /* Header de categoría */
+    .island-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .island-title {
+      font-size: 1.5rem;
+    }
+
+    .island-icon {
+      font-size: 1.25rem;
+    }
+
+    .island-more {
+      font-size: 0.75rem;
+      padding: 0.5rem 1rem;
+    }
+
+    /* Espaciado entre secciones */
+    .category-island {
+      margin-bottom: 3rem;
+    }
+
+    /* Carrusel en móvil */
+    .carousel-hero {
+      height: 300px;
+      margin-bottom: 2rem;
+    }
+
+    .carousel-title-small {
+      display: none;
+    }
+
+    .carousel-full-content {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+      z-index: 3 !important;
+      bottom: 1.5rem;
+      left: 1rem;
+      right: 1rem;
+      gap: 0.75rem;
+    }
+
+    .carousel-full-content .carousel-title {
+      font-size: 1.25rem;
+      line-height: 1.2;
+    }
+
+    .carousel-description {
+      font-size: 0.9rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .carousel-category {
+      font-size: 0.85rem;
+    }
+
+    .carousel-meta {
+      gap: 1rem;
+    }
+
+    .carousel-date {
+      font-size: 0.75rem;
+    }
+
+    .carousel-tags {
+      display: none;
+    }
+
+    .carousel-overlay-hover {
+      opacity: 0.88 !important;
+    }
+
+    .carousel-control {
+      padding: 0.25rem;
+      opacity: 0.6;
+    }
+
+    .carousel-control span {
+      font-size: 2.5rem;
+    }
+
+    .carousel-control.prev {
+      left: 0;
+    }
+
+    .carousel-control.next {
+      right: 0;
+    }
+
+    .carousel-indicators {
+      bottom: 1rem;
+      gap: 0.5rem;
+    }
+
+    .carousel-indicator {
+      width: 8px;
+      height: 8px;
+    }
+  }
+</style>
+
+<script>
+  // Carrusel funcionalidad
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.carousel-slide');
+  const indicators = document.querySelectorAll('.carousel-indicator');
+  const totalSlides = slides.length;
+  let autoPlayInterval: number | undefined;
+
+  function showSlide(index: number) {
+    // Remover clases activas
+    slides.forEach(s => s.classList.remove('active'));
+    indicators.forEach(i => i.classList.remove('active'));
+
+    // Circular navigation
+    if (index >= totalSlides) {
+      currentSlide = 0;
+    } else if (index < 0) {
+      currentSlide = totalSlides - 1;
+    } else {
+      currentSlide = index;
+    }
+
+    // Activar slide e indicador actual
+    slides[currentSlide].classList.add('active');
+    indicators[currentSlide].classList.add('active');
+  }
+
+  function nextSlide() {
+    showSlide(currentSlide + 1);
+  }
+
+  function prevSlide() {
+    showSlide(currentSlide - 1);
+  }
+
+  function startAutoPlay() {
+    autoPlayInterval = window.setInterval(nextSlide, 5000); // Cambiar cada 5 segundos
+  }
+
+  function stopAutoPlay() {
+    if (autoPlayInterval) {
+      clearInterval(autoPlayInterval);
+    }
+  }
+
+  // Event listeners para controles
+  const nextBtn = document.querySelector('.carousel-control.next');
+  const prevBtn = document.querySelector('.carousel-control.prev');
+
+  nextBtn?.addEventListener('click', () => {
+    nextSlide();
+    stopAutoPlay();
+    startAutoPlay(); // Reiniciar el timer
+  });
+
+  prevBtn?.addEventListener('click', () => {
+    prevSlide();
+    stopAutoPlay();
+    startAutoPlay(); // Reiniciar el timer
+  });
+
+  // Event listeners para indicadores
+  indicators.forEach((indicator, index) => {
+    indicator.addEventListener('click', () => {
+      showSlide(index);
+      stopAutoPlay();
+      startAutoPlay(); // Reiniciar el timer
+    });
+  });
+
+  // Pausar auto-play cuando el mouse está sobre el carrusel
+  const carouselHero = document.querySelector('.carousel-hero');
+  carouselHero?.addEventListener('mouseenter', stopAutoPlay);
+  carouselHero?.addEventListener('mouseleave', startAutoPlay);
+
+  // Iniciar auto-play cuando carga la página
+  startAutoPlay();
+
+  // Pausar cuando la tab no está visible
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stopAutoPlay();
+    } else {
+      startAutoPlay();
+    }
+  });
+
+  // Manejar clicks en las cards
+  document.querySelectorAll('.island-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      // Si el click fue en un tag, no navegar a la card
+      if ((e.target as HTMLElement).closest('.card-tag')) {
+        return;
+      }
+      // Navegar al post
+      const href = card.getAttribute('data-href');
+      if (href) {
+        window.location.href = href;
+      }
+    });
+  });
+
+  // Manejar clicks en el carrusel
+  document.querySelectorAll('.carousel-slide').forEach(slide => {
+    slide.addEventListener('click', (e) => {
+      // Si el click fue en un tag o control, no navegar
+      if ((e.target as HTMLElement).closest('.carousel-tag') ||
+          (e.target as HTMLElement).closest('.carousel-control') ||
+          (e.target as HTMLElement).closest('.carousel-indicator')) {
+        return;
+      }
+      // Navegar al post
+      const href = slide.getAttribute('data-href');
+      if (href) {
+        window.location.href = href;
+      }
+    });
+  });
+</script>

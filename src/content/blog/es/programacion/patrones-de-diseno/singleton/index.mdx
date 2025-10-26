@@ -1,0 +1,253 @@
+---
+title: "Patrón Singleton en TypeScript"
+description: "Aprende qué es el patrón Singleton, cuándo usarlo y cómo implementarlo correctamente en TypeScript con ejemplos prácticos."
+pubDate: "2025-01-25"
+category: "patrones-de-diseno"
+subcategory: "creacionales"
+tags: ["patrones-de-diseno", "singleton", "typescript", "creacionales", "poo"]
+heroImage: "./hero.jpg"
+draft: false
+---
+
+import CodePlayground from '../../../../../../components/CodePlayground.astro';
+
+# Patrón Singleton
+
+## Conceptos clave
+
+- Patrón de diseño creacional
+- Garantiza una única instancia de una clase
+- Punto de acceso global a la instancia
+- Control estricto sobre cómo y cuándo se accede a la instancia
+- Implementación mediante constructor privado
+
+## ¿Qué es el patrón Singleton?
+
+El patrón Singleton es un patrón de diseño creacional que garantiza que una clase tenga una única instancia y proporciona un punto de acceso global a esa instancia.
+
+Este patrón resuelve dos problemas al mismo tiempo:
+
+1. **Garantiza que una clase tenga solo una instancia**: Esto es útil cuando necesitamos controlar el acceso a recursos compartidos, como una conexión a base de datos o un archivo.
+
+2. **Proporciona un punto de acceso global**: La instancia debe ser accesible desde cualquier parte del código.
+
+## ¿Cuándo usar Singleton?
+
+El patrón Singleton debe usarse cuando:
+
+- Necesitas exactamente una instancia de una clase en toda la aplicación
+- La instancia debe ser accesible desde múltiples puntos de tu código
+- Quieres controlar estrictamente cuándo se crea la instancia
+- Necesitas inicialización tardía (lazy initialization)
+
+### Casos de uso comunes
+
+- Gestores de configuración
+- Conexiones a bases de datos
+- Registros de logs (loggers)
+- Cachés
+- Pools de conexiones
+- Gestores de estado global
+
+## Implementación básica en TypeScript
+
+```typescript
+class Singleton {
+    private static instance: Singleton;
+
+    // Constructor privado para prevenir instanciación directa
+    private constructor() {
+        console.log('Singleton creado');
+    }
+
+    // Método estático para obtener la instancia
+    public static getInstance(): Singleton {
+        if (!Singleton.instance) {
+            Singleton.instance = new Singleton();
+        }
+        return Singleton.instance;
+    }
+
+    public someMethod(): void {
+        console.log('Ejecutando método del Singleton');
+    }
+}
+```
+
+### Uso del Singleton
+
+```typescript
+// Esto no funciona - el constructor es privado
+// const singleton = new Singleton(); // Error!
+
+// Forma correcta de obtener la instancia
+const instance1 = Singleton.getInstance();
+const instance2 = Singleton.getInstance();
+
+console.log(instance1 === instance2); // true - misma instancia
+
+instance1.someMethod();
+```
+
+## Implementación con inicialización de datos
+
+```typescript
+class DatabaseConnection {
+    private static instance: DatabaseConnection;
+    private connectionString: string;
+    private isConnected: boolean = false;
+
+    private constructor() {
+        // Constructor privado
+    }
+
+    public static getInstance(): DatabaseConnection {
+        if (!DatabaseConnection.instance) {
+            DatabaseConnection.instance = new DatabaseConnection();
+        }
+        return DatabaseConnection.instance;
+    }
+
+    public connect(connectionString: string): void {
+        if (!this.isConnected) {
+            this.connectionString = connectionString;
+            this.isConnected = true;
+            console.log(`Conectado a: ${this.connectionString}`);
+        }
+    }
+
+    public query(sql: string): void {
+        if (this.isConnected) {
+            console.log(`Ejecutando query: ${sql}`);
+        } else {
+            console.log('Error: No hay conexión');
+        }
+    }
+}
+```
+
+### Uso de DatabaseConnection
+
+```typescript
+const db1 = DatabaseConnection.getInstance();
+db1.connect('localhost:5432/mydb');
+
+const db2 = DatabaseConnection.getInstance();
+db2.query('SELECT * FROM users');
+
+// db1 y db2 son la misma instancia
+console.log(db1 === db2); // true
+```
+
+## Singleton con módulos ES6
+
+En TypeScript/JavaScript moderno, los módulos son singleton por naturaleza:
+
+```typescript
+// logger.ts
+class Logger {
+    private logs: string[] = [];
+
+    public log(message: string): void {
+        const timestamp = new Date().toISOString();
+        this.logs.push(`[${timestamp}] ${message}`);
+        console.log(`[${timestamp}] ${message}`);
+    }
+
+    public getLogs(): string[] {
+        return [...this.logs];
+    }
+}
+
+// Exportamos una instancia única
+export const logger = new Logger();
+```
+
+### Uso del logger
+
+```typescript
+// app.ts
+import { logger } from './logger';
+
+logger.log('Aplicación iniciada');
+logger.log('Usuario conectado');
+
+console.log(logger.getLogs());
+```
+
+## Ventajas del patrón Singleton
+
+- **Control estricto**: Solo una instancia en toda la aplicación
+- **Acceso global**: Punto de acceso único y bien definido
+- **Inicialización tardía**: La instancia se crea solo cuando se necesita
+- **Ahorro de memoria**: No se crean múltiples instancias del mismo recurso
+
+## Desventajas del patrón Singleton
+
+- **Estado global**: Puede dificultar el testing y crear dependencias ocultas
+- **Acoplamiento**: Las clases que usan el Singleton están fuertemente acopladas a él
+- **Dificulta el testing**: Complicado hacer mock o reset entre tests
+- **Violación del principio de responsabilidad única**: La clase controla tanto su lógica como su ciclo de vida
+- **Problemas en entornos multi-hilo**: Puede requerir sincronización adicional
+
+## Alternativas modernas
+
+En aplicaciones modernas de TypeScript/JavaScript, considera estas alternativas:
+
+### Inyección de dependencias
+
+```typescript
+class UserService {
+    constructor(private logger: Logger, private db: DatabaseConnection) {}
+
+    createUser(name: string): void {
+        this.logger.log(`Creando usuario: ${name}`);
+        this.db.query(`INSERT INTO users (name) VALUES ('${name}')`);
+    }
+}
+
+// Las dependencias se inyectan, no se obtienen globalmente
+const service = new UserService(logger, dbConnection);
+```
+
+### Context API o Estado centralizado
+
+En aplicaciones React, Vue o Angular, usa los sistemas de gestión de estado integrados en lugar de Singletons globales.
+
+## Conclusión
+
+El patrón Singleton es útil cuando necesitas garantizar una única instancia, pero debe usarse con precaución. En aplicaciones modernas, considera alternativas como inyección de dependencias o gestión de estado centralizada que ofrecen más flexibilidad y facilitan el testing.
+
+## Prueba el código
+
+Aquí puedes probar una implementación del patrón Singleton en Python. Prueba crear múltiples instancias y verifica que todas son la misma:
+
+<CodePlayground
+  language="python"
+  title="Singleton en Python"
+  code={`class Singleton:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            print("Creando nueva instancia...")
+            cls._instance = super().__new__(cls)
+        else:
+            print("Retornando instancia existente")
+        return cls._instance
+
+    def __init__(self):
+        self.value = "Soy un Singleton"
+
+# Prueba
+print("Primera llamada:")
+s1 = Singleton()
+print(f"ID de s1: {id(s1)}")
+
+print("\\nSegunda llamada:")
+s2 = Singleton()
+print(f"ID de s2: {id(s2)}")
+
+print(f"\\n¿Son la misma instancia? {s1 is s2}")
+print(f"Valor: {s1.value}")`}
+/>

@@ -1,0 +1,43 @@
+---
+import { getCollection, type CollectionEntry, render } from 'astro:content';
+import BlogPost from '../../../layouts/BlogPost.astro';
+import { ui } from '../../../i18n/ui';
+
+export async function getStaticPaths() {
+  const blogEntries = await getCollection('blog', ({ data }) => {
+    return data.draft !== true;
+  });
+
+  return blogEntries.map(entry => {
+    // Extract language from entry.id (e.g., "es/programacion/..." or "en/programming/...")
+    const [lang, ...rest] = entry.id.split('/');
+    const slug = rest.join('/').replace(/\/index\.(md|mdx)$/, '');
+
+    return {
+      params: {
+        lang,
+        slug
+      },
+      props: { entry },
+    };
+  });
+}
+
+type Props = {
+  entry: CollectionEntry<'blog'>;
+};
+
+const { entry } = Astro.props as Props;
+const { lang } = Astro.params;
+
+// Validate language
+if (!(lang in ui)) {
+  return Astro.redirect('/es');
+}
+
+const { Content } = await render(entry);
+---
+
+<BlogPost {...entry.data} slug={entry.id} lang={lang}>
+  <Content />
+</BlogPost>

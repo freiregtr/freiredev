@@ -1,5 +1,8 @@
 ---
 import '../styles/global.css';
+import LanguageSwitcher from '../components/LanguageSwitcher.astro';
+import { getLangFromUrl } from '../i18n/utils';
+import { ui } from '../i18n/ui';
 
 interface Props {
   title: string;
@@ -7,10 +10,29 @@ interface Props {
 }
 
 const { title, description = 'Blog personal de Ramon Freire sobre TypeScript, IoT, Programación y Linux' } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+
+// Generate hreflang URLs for current page
+const currentPath = Astro.url.pathname;
+const pathParts = currentPath.split('/').filter(p => p);
+
+// Remove language prefix if present
+if (pathParts.length > 0 && pathParts[0] in ui) {
+  pathParts.shift();
+}
+
+const basePath = pathParts.length > 0 ? '/' + pathParts.join('/') : '';
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') || 'https://freiredev.com';
+
+// Generate alternate URLs for all languages
+const alternateUrls = Object.keys(ui).map(langCode => ({
+  lang: langCode,
+  url: `${siteUrl}/${langCode}${basePath}`
+}));
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
@@ -20,6 +42,13 @@ const { title, description = 'Blog personal de Ramon Freire sobre TypeScript, Io
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <meta name="generator" content={Astro.generator} />
+
+    <!-- Hreflang tags for SEO -->
+    {alternateUrls.map(({ lang: altLang, url }) => (
+      <link rel="alternate" hreflang={altLang} href={url} />
+    ))}
+    <link rel="alternate" hreflang="x-default" href={`${siteUrl}/es${basePath}`} />
+
     <title>{title}</title>
   </head>
   <body>
@@ -45,9 +74,10 @@ const { title, description = 'Blog personal de Ramon Freire sobre TypeScript, Io
 
         <!-- Nav links (desktop) -->
         <div class="nav-links">
-          <a href="/" class="nav-link">INICIO</a>
-          <a href="/blog" class="nav-link">BLOG</a>
-          <a href="/categorias" class="nav-link">CATEGORÍAS</a>
+          <a href={`/${lang}`} class="nav-link">INICIO</a>
+          <a href={`/${lang}/blog`} class="nav-link">BLOG</a>
+          <a href={`/${lang}/categorias`} class="nav-link">CATEGORÍAS</a>
+          <LanguageSwitcher />
           <label class="theme-switch">
             <input type="checkbox" id="theme-toggle" />
             <span class="slider"></span>
@@ -58,9 +88,13 @@ const { title, description = 'Blog personal de Ramon Freire sobre TypeScript, Io
       <!-- Menú móvil overlay -->
       <div class="mobile-menu" id="mobile-menu">
         <div class="mobile-menu-content">
-          <a href="/" class="mobile-link">INICIO</a>
-          <a href="/blog" class="mobile-link">BLOG</a>
-          <a href="/categorias" class="mobile-link">CATEGORÍAS</a>
+          <a href={`/${lang}`} class="mobile-link">INICIO</a>
+          <a href={`/${lang}/blog`} class="mobile-link">BLOG</a>
+          <a href={`/${lang}/categorias`} class="mobile-link">CATEGORÍAS</a>
+          <div class="mobile-lang-switch">
+            <span class="lang-label">IDIOMA</span>
+            <LanguageSwitcher />
+          </div>
           <div class="mobile-theme-switch">
             <span class="theme-label">TEMA</span>
             <label class="theme-switch">
@@ -671,12 +705,29 @@ const { title, description = 'Blog personal de Ramon Freire sobre TypeScript, Io
     margin-right: 0.5rem;
   }
 
-  .mobile-theme-switch {
+  .mobile-lang-switch {
     display: flex;
     align-items: center;
     gap: 1rem;
     margin-top: 2rem;
     padding-top: 2rem;
+    border-top: 1px solid var(--grid-line);
+  }
+
+  .lang-label {
+    font-family: var(--font-primary);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.15em;
+  }
+
+  .mobile-theme-switch {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
     border-top: 1px solid var(--grid-line);
   }
 

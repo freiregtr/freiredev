@@ -1,0 +1,82 @@
+---
+import { getLangFromUrl, getRouteFromUrl } from '../i18n/utils';
+import { languages } from '../i18n/ui';
+
+const currentLang = getLangFromUrl(Astro.url);
+const currentPath = Astro.url.pathname;
+
+// Function to switch language in current path
+function switchLanguage(newLang: string): string {
+  // Extract the path without the language prefix
+  const pathParts = currentPath.split('/').filter(p => p);
+
+  // If first part is a language code, remove it
+  if (pathParts.length > 0 && pathParts[0] in languages) {
+    pathParts.shift();
+  }
+
+  // Build new path with new language
+  return `/${newLang}${pathParts.length > 0 ? '/' + pathParts.join('/') : ''}`;
+}
+
+const availableLanguages = Object.entries(languages);
+---
+
+<div class="language-switcher">
+  {availableLanguages.map(([code, name]) => (
+    <a
+      href={switchLanguage(code)}
+      class={`lang-btn ${currentLang === code ? 'active' : ''}`}
+      aria-label={`Cambiar a ${name}`}
+      title={name}
+    >
+      {code.toUpperCase()}
+    </a>
+  ))}
+</div>
+
+<style>
+  .language-switcher {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+    padding: 0.25rem;
+    background: rgba(0, 217, 255, 0.05);
+    border: 1px solid var(--border-glow);
+    border-radius: 6px;
+  }
+
+  .lang-btn {
+    font-family: var(--font-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 0.4rem 0.75rem;
+    border-radius: 4px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+
+  .lang-btn:hover {
+    color: var(--cyan-neon);
+    background: rgba(0, 217, 255, 0.1);
+    border-color: var(--cyan-neon);
+    box-shadow: 0 0 10px var(--cyan-glow);
+  }
+
+  .lang-btn.active {
+    color: var(--bg-primary);
+    background: var(--cyan-neon);
+    border-color: var(--cyan-neon);
+    box-shadow: 0 0 15px var(--cyan-glow);
+    pointer-events: none;
+  }
+
+  /* Light mode adjustments */
+  :root.light-mode .lang-btn.active {
+    color: #0a0e1a;
+  }
+</style>
