@@ -17,7 +17,7 @@ function switchLanguage(newLang: string): string | null {
   // If we're on a blog post page and have the necessary data
   if (entryId && allPosts) {
     // Extract the post slug without language (e.g., "programacion/patrones-de-diseno/singleton/index.mdx")
-    const [currentPostLang, ...slugParts] = entryId.split('/');
+    const [, ...slugParts] = entryId.split('/');
     const currentSlug = slugParts.join('/');
 
     // Try to find the translation

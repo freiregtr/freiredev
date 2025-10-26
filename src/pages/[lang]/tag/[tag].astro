@@ -8,7 +8,7 @@ import '../../../styles/tag-page.css';
 
 export async function getStaticPaths() {
   const languages = Object.keys(ui);
-  const paths = [];
+  const paths: Array<{ params: { lang: string; tag: string }; props: { lang: string; tag: string } }> = [];
 
   for (const lang of languages) {
     // Get all posts for this language
