@@ -9,6 +9,7 @@ export function initTronGrid() {
   const TRAIL_LENGTH = 8; // 8 squares
   const BIKE_SPEED = 2; // pixels per frame
   const NUM_BIKES = 4; // Number of bikes
+  const MAX_OPACITY = 0.3; // Reduced from 0.9 for subtlety
 
   interface Point {
     x: number;
@@ -38,8 +39,8 @@ export function initTronGrid() {
   function createBike(): Bike {
     const isHorizontal = Math.random() > 0.5;
     const colors = [
-      { color: 'rgba(0, 217, 255, 0.8)', glow: 'rgba(0, 217, 255, 0.4)' },
-      { color: 'rgba(255, 107, 53, 0.8)', glow: 'rgba(255, 107, 53, 0.4)' }
+      { color: 'rgba(0, 217, 255, 0.5)', glow: 'rgba(0, 217, 255, 0.2)' },
+      { color: 'rgba(255, 107, 53, 0.5)', glow: 'rgba(255, 107, 53, 0.2)' }
     ];
     const colorSet = colors[Math.floor(Math.random() * colors.length)];
 
@@ -122,7 +123,7 @@ export function initTronGrid() {
 
       // Calculate opacity based on age (newer = more opaque)
       const lifeProgress = 1 - (point.age / maxAge);
-      const opacity = lifeProgress * 0.9;
+      const opacity = lifeProgress * MAX_OPACITY;
 
       ctx.beginPath();
       ctx.moveTo(prevPoint.x, prevPoint.y);
@@ -130,11 +131,11 @@ export function initTronGrid() {
 
       // Main line
       ctx.strokeStyle = bike.color.replace(/[\d.]+\)$/, `${opacity})`);
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      // Glow effect
-      ctx.shadowBlur = 15 * lifeProgress;
+      // Glow effect (reduced)
+      ctx.shadowBlur = 5 * lifeProgress;
       ctx.shadowColor = bike.glowColor;
       ctx.stroke();
       ctx.shadowBlur = 0;
