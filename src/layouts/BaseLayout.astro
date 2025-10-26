@@ -61,7 +61,7 @@ const alternateUrls = Object.keys(ui).map(langCode => ({
     <header class="header-tron">
       <div class="header-glow"></div>
       <nav class="nav-container">
-        <a href="/" class="logo">
+        <a href="/" class="logo" id="logo-link">
           <span class="logo-dollar">$</span>
           <span class="logo-bracket-left">{'{'}</span>
           <span class="logo-text">FREIRE.DEV</span>
@@ -207,6 +207,15 @@ const alternateUrls = Object.keys(ui).map(langCode => ({
       themeToggleMobile?.addEventListener('change', (e) => {
         const target = e.target as HTMLInputElement;
         toggleTheme(target.checked);
+      });
+
+      // Logo link: redirect to preferred language
+      const logoLink = document.getElementById('logo-link');
+      logoLink?.addEventListener('click', (e) => {
+        e.preventDefault();
+        const savedLang = localStorage.getItem('preferred-language');
+        const targetLang = savedLang || 'es';
+        window.location.href = `/${targetLang}`;
       });
     </script>
 

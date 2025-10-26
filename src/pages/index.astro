@@ -1,21 +1,4 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FreireDev</title>
-  <style>body{margin:0;padding:0;background:#0a0e1a;visibility:hidden}</style>
-  <script>
-    // Instant redirect - executes before page renders
-    (function() {
-      const savedLang = localStorage.getItem('preferred-language');
-      const targetLang = savedLang || 'es';
-      window.location.replace('/' + targetLang);
-    })();
-  </script>
-  <noscript>
-    <meta http-equiv="refresh" content="0; url=/es">
-  </noscript>
-</head>
-<body></body>
-</html>
+---
+// Redirect root to default language
+return Astro.redirect('/es');
+---
