@@ -80,12 +80,29 @@ const availableLanguages = Object.entries(languages);
         class={`lang-btn ${isActive ? 'active' : ''}`}
         aria-label={`Cambiar a ${name}`}
         title={name}
+        data-lang={code}
       >
         {code.toUpperCase()}
       </a>
     );
   })}
 </div>
+
+<script>
+  // Save language preference when clicking on language switcher
+  document.addEventListener('DOMContentLoaded', () => {
+    const langButtons = document.querySelectorAll('.lang-btn:not(.disabled)');
+
+    langButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        const lang = (e.currentTarget as HTMLElement).getAttribute('data-lang');
+        if (lang) {
+          localStorage.setItem('preferred-language', lang);
+        }
+      });
+    });
+  });
+</script>
 
 <style>
   .language-switcher {

@@ -183,6 +183,13 @@ const alternateUrls = Object.keys(ui).map(langCode => ({
         }
       }
 
+      // Guardar preferencia de idioma actual
+      const currentPath = window.location.pathname;
+      const currentLang = currentPath.split('/')[1]; // Extract lang from /es/ or /en/
+      if (currentLang === 'es' || currentLang === 'en') {
+        localStorage.setItem('preferred-language', currentLang);
+      }
+
       // Función para cambiar tema
       function toggleTheme(checked: boolean) {
         if (checked) {

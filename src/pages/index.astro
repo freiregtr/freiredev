@@ -1,4 +1,20 @@
----
-// Redirect root to default language
-return Astro.redirect('/es');
----
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreireDev</title>
+  <script>
+    // Read saved language preference and redirect
+    const savedLang = localStorage.getItem('preferred-language');
+    const targetLang = savedLang || 'es'; // Default to Spanish
+    window.location.replace(`/${targetLang}`);
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0; url=/es">
+  </noscript>
+</head>
+<body>
+  <p style="font-family: monospace; text-align: center; margin-top: 2rem;">Redirecting...</p>
+</body>
+</html>
