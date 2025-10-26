@@ -22,3 +22,9 @@ yarn-error.log*
 # Build
 /tmp
 /out-tsc
+
+# Old projects
+freiredev.cl/
+
+# WebStorm terminal history
+*terminal*history*
